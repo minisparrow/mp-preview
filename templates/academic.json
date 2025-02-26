@@ -13,9 +13,9 @@
         "quote": "border-left: 4px solid #8D6E63; border-radius: 6px; padding: 16px 20px; background: #EFEBE9; margin: 0.8em 0; color: #5D4037; font-style: italic; font-size: 1em; word-wrap: break-word;",
         "link": "color: #795548; text-decoration: none; border-bottom: 1px solid #8D6E63; transition: all 0.2s ease;",
         "emphasis": {
-            "strong": "font-weight: 600; color: #5D4037;",
-            "em": "font-style: italic; color: #6D4C41;",
-            "del": "text-decoration: line-through; color: #8D6E63;"
+            "strong": "font-weight: 600; color: #4a4a4a;",
+            "em": "font-style: italic; color: #4a4a4a;",
+            "del": "text-decoration: line-through; color: #4a4a4a;"
         },
         "list": {
             "container": "padding-left: 20px; margin-bottom: 1.2em; color: #4a4a4a;",

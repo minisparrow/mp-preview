@@ -140,7 +140,6 @@ export class MPConverter {
             
             try {
                 const newImg = document.createElement('img');
-                // 使用 Obsidian API 获取图片的绝对路径
                 const file = this.app.vault.getAbstractFileByPath(src);
                 if (file) {
                     const absolutePath = this.app.vault.adapter.getResourcePath(src);
@@ -153,12 +152,8 @@ export class MPConverter {
                     newImg.style.display = 'block';
                     newImg.style.margin = '1em auto';
                     
-                    if (parentP) {
-                        parentP.innerHTML = '';
-                        parentP.appendChild(newImg);
-                    } else {
-                        originalSpan.parentNode?.replaceChild(newImg, originalSpan);
-                    }
+                    // 直接替换 span 元素，保留段落中的其他内容
+                    originalSpan.parentNode?.replaceChild(newImg, originalSpan);
                 }
             } catch (error) {
                 console.error('图片处理失败:', error);

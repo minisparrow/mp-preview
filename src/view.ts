@@ -74,7 +74,7 @@ export class MPView extends ItemView {
             await this.settingsManager.updateSettings({
                 templateId: value
             });
-            this.updatePreview();
+            this.templateManager.applyTemplate(this.previewEl);
         });
     
         this.customFontSelect = this.createCustomSelect(
@@ -90,7 +90,7 @@ export class MPView extends ItemView {
             await this.settingsManager.updateSettings({
                 fontFamily: value
             });
-            this.updatePreview();
+            this.templateManager.applyTemplate(this.previewEl);
         });
         this.customFontSelect.id = 'font-select';
         // 字号调整
@@ -174,7 +174,7 @@ export class MPView extends ItemView {
             await this.settingsManager.updateSettings({
                 fontSize: size
             });
-            this.updatePreview();
+            this.templateManager.applyTemplate(this.previewEl);
         };
 
         // 字号调整按钮事件
@@ -363,7 +363,7 @@ export class MPView extends ItemView {
             this
         );
 
-        // 2. 格式化内容
+        // 2. 格式化内容 (只在内容更新时执行)
         MPConverter.formatContent(this.previewEl);
 
         // 3. 应用模板样式

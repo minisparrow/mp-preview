@@ -243,11 +243,13 @@ export class TemplateManager {
             // 应用基础样式
             el.setAttribute('style', `${styles.image}; font-family: ${this.currentFont};`);
             
-            // 确保图片容器样式正确
+            // 如果图片是段落中唯一的元素，才设置居中
             const parent = img.parentElement;
             if (parent && parent.tagName.toLowerCase() === 'p') {
-                parent.style.textAlign = 'center';
-                parent.style.margin = '1em 0';
+                if (parent.childNodes.length === 1) {
+                    parent.style.textAlign = 'center';
+                    parent.style.margin = '1em 0';
+                }
             }
         });
 
