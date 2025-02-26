@@ -1,5 +1,5 @@
 {
-  "templateId": "minimal",
-  "fontFamily": "SimSun, \"宋体\", serif",
-  "fontSize": 13
+  "templateId": "elegant",
+  "fontFamily": "Optima-Regular, Optima, PingFangSC-light, PingFangTC-light, \"PingFang SC\", Cambria, Cochin, Georgia, Times, \"Times New Roman\", serif",
+  "fontSize": 15
 }

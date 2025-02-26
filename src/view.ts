@@ -227,7 +227,7 @@ export class MPView extends ItemView {
         const likeButton = bottomControlsGroup.createEl('button', { 
             cls: 'mp-like-button'
         });
-        likeButton.innerHTML = '<span style="margin-right: 4px">☕️</span>请作者喝咖啡';
+        likeButton.innerHTML = '<span style="margin-right: 4px">☕️</span>喜欢作者';
         likeButton.addEventListener('click', () => {
             DonateManager.showDonateModal(this.containerEl);
         });

@@ -134,15 +134,19 @@ export class MPConverter {
             const originalSpan = el as HTMLElement;
             const src = originalSpan.getAttribute('src');
             const alt = originalSpan.getAttribute('alt');
-            const parentP = originalSpan.closest('p');
             
             if (!src) return;
             
             try {
-                const newImg = document.createElement('img');
-                const file = this.app.vault.getAbstractFileByPath(src);
+                // 获取文件的元数据
+                const linktext = src.split('|')[0];  // 处理可能带有别名的链接
+                console.log(src);
+                console.log(linktext);
+                const file = this.app.metadataCache.getFirstLinkpathDest(linktext, '');
+                console.log(file);
                 if (file) {
-                    const absolutePath = this.app.vault.adapter.getResourcePath(src);
+                    const absolutePath = this.app.vault.adapter.getResourcePath(file.path);
+                    const newImg = document.createElement('img');
                     newImg.src = absolutePath;
                     if (alt) newImg.alt = alt;
                     
