@@ -1,0 +1,406 @@
+/* 工具栏基础样式 */
+.mp-toolbar, .mp-bottom-bar {
+    padding: 12px 32px;
+    position: sticky;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    min-width: 680px;
+}
+
+.mp-toolbar {
+    top: 0;
+    background: rgba(82, 144, 220, 0.03);
+    border-bottom: 1px solid rgba(82, 144, 220, 0.1);
+}
+
+.mp-bottom-bar {
+    bottom: 0;
+    background: rgba(82, 144, 220, 0.02);
+    border-top: 1px solid rgba(82, 144, 220, 0.1);
+}
+
+/* 控件组布局 */
+.mp-controls-group, .mp-bottom-controls-group {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin: 0 auto;
+    width: fit-content;
+    min-width: fit-content;
+    margin-left: 40px;
+}
+
+/* 锁定按钮 */
+.mp-lock-button {
+    width: 32px;
+    height: 32px;
+    border: 1px solid #e8e8e8;
+    border-radius: 8px;
+    background: white;
+    color: #666;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    font-size: 16px;
+    box-shadow: 0 1px 3px rgba(82, 144, 220, 0.1);
+}
+
+.mp-lock-button:hover {
+    background: #f5f8fc;
+    border-color: #5C5F77;
+    color: #5C5F77;
+    box-shadow: 0 2px 6px rgba(82, 144, 220, 0.15);
+}
+
+/* 下拉选择器 */
+.custom-select-container {
+    position: relative;
+    width: 150px;
+}
+
+.custom-select {
+    height: 32px;
+    padding: 0 12px;
+    border: 1px solid #5C5F77;
+    border-radius: 8px;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.2s ease;
+    color: #5C5F77;
+    box-shadow: 0 1px 3px rgba(82, 144, 220, 0.1);
+}
+
+.custom-select:hover {
+    background: #f5f8fc;
+    box-shadow: 0 2px 6px rgba(82, 144, 220, 0.15);
+}
+
+.custom-select.disabled {
+    opacity: 0.5;
+    background: #f5f5f5 !important;
+    color: #999 !important;
+    border-color: #e8e8e8 !important;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+.select-arrow {
+    color: #5C5F77;
+    font-size: 12px;
+    transition: transform 0.2s ease;
+}
+
+.select-dropdown {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    width: 100%;
+    background: white;
+    border: 1px solid #e8e8e8;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(82, 144, 220, 0.15);
+    display: none;
+    z-index: 1000;
+    overflow: hidden;
+}
+
+.select-dropdown.show {
+    display: block;
+}
+
+.select-item {
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: #333;
+}
+
+.select-item:hover {
+    background: #f5f8fc;
+}
+
+.select-item.selected {
+    background-color: #f5f8fc;
+    color: #5C5F77;
+}
+
+/* 字号调整组件 */
+.mp-font-size-group {
+    width: 150px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 32px;
+    background: white;
+    border: 1px solid #5C5F77;
+    border-radius: 8px;
+    padding: 0;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(82, 144, 220, 0.1);
+}
+
+.mp-font-size-btn {
+    width: 55px;
+    height: 32px;
+    border: none;
+    background: white;
+    color: #5C5F77;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    font-size: 16px;
+}
+
+.mp-font-size-btn:hover {
+    background: rgba(82, 144, 220, 0.05);
+}
+
+.mp-font-size-input {
+    width: 40px;
+    text-align: center;
+    font-size: 16px;
+    padding: 0;
+    margin: 0;
+    border: none;
+    background: transparent;
+    color: #5C5F77;
+    outline: none;
+}
+
+/* 预览区域 */
+.mp-preview-area {
+    padding: 32px;
+    margin: 20px;
+    height: calc(100% - 160px);
+    overflow-y: auto;
+    background: white;
+    flex: 1;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+    border: 1px solid rgba(82, 144, 220, 0.1);
+}
+
+.mp-empty-message {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    color: #999;
+    font-size: 16px;
+}
+
+/* 帮助按钮 */
+.mp-help-button {
+    width: 32px;
+    height: 32px;
+    border: 1px solid #e8e8e8;
+    border-radius: 8px;
+    background: white;
+    color: #666;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    font-size: 16px;
+    box-shadow: 0 1px 3px rgba(82, 144, 220, 0.1);
+}
+.mp-help-button:hover{
+    background: #f5f8fc;
+    border-color: #5C5F77;
+    color: #5C5F77;
+    box-shadow: 0 2px 6px rgba(82, 144, 220, 0.15);
+}
+
+/* 提示框位置调整 */
+.mp-help-tooltip {
+    position: absolute;
+    left: 32px; /* 改为左对齐 */
+    bottom: 48px;
+    width: 300px;
+    padding: 12px 16px;
+    background: white;
+    border: 2px solid rgba(82, 144, 220, 0.1);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    font-size: 13px;
+    line-height: 1.6;
+    color: #5290DC;
+    display: none;
+    white-space: pre-line;
+    z-index: 1000;
+}
+
+.mp-help-button:hover + .mp-help-tooltip {
+    display: block;
+}
+/* 底部按钮 */
+.mp-bottom-controls-group button {
+    padding: 8px 24px;
+    width: 150px;
+    height: 36px;
+    border-radius: 8px;
+    border: 1px solid #5C5F77;
+    background: white;
+    color: #5C5F77;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    box-shadow: 0 1px 3px rgba(82, 144, 220, 0.1);
+}
+
+.mp-bottom-controls-group button:hover {
+    background: rgba(82, 144, 220, 0.05);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(82, 144, 220, 0.2);
+}
+
+.mp-copy-button:not(:disabled) {
+    background: #5290DC !important;
+    color: white !important;
+    border: none !important;
+    box-shadow: 0 2px 6px rgba(82, 144, 220, 0.2) !important;
+}
+
+.mp-copy-button:not(:disabled):hover {
+    background: #4a83c8 !important;
+    box-shadow: 0 4px 12px rgba(82, 144, 220, 0.3) !important;
+}
+
+.mp-new-button {
+    opacity: 0.5;
+    border-color: #5C5F77 !important;
+    background: white !important;
+    color: #5C5F77 !important;
+    cursor: not-allowed !important;
+}
+
+.mp-bottom-controls-group button:disabled {
+    opacity: 0.5;
+    background: white !important;
+    color: #5C5F77 !important;
+    cursor: not-allowed !important;
+    transform: none;
+    border-color: #5C5F77 !important;
+    box-shadow: none;
+}
+
+.mp-donate-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mp-donate-modal {
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    width: 400px;
+    position: relative;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.mp-donate-close {
+    position: absolute;
+    right: 15px;
+    top: 15px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #999;
+    padding: 5px;
+    line-height: 1;
+}
+
+.mp-donate-close:hover {
+    color: #666;
+}
+
+.mp-donate-title {
+    margin: 0 0 20px;
+    text-align: center;
+    color: #333;
+    font-size: 1.5em;
+}
+
+.mp-donate-desc {
+    text-align: center;
+    color: #666;
+    margin-bottom: 20px;
+}
+
+.mp-donate-content {
+    text-align: center;
+}
+
+.mp-donate-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.mp-donate-tab {
+    padding: 8px 20px;
+    border: none;
+    background: #f5f5f5;
+    border-radius: 20px;
+    cursor: pointer;
+    color: #666;
+    transition: all 0.3s ease;
+}
+
+.mp-donate-tab.active {
+    background: #4A90E2;
+    color: white;
+}
+
+.mp-donate-qr-container {
+    position: relative;
+    width: 200px;
+    height: 200px;
+    margin: 0 auto;
+}
+
+.mp-donate-qr {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    display: none;
+}
+
+.mp-donate-qr.active {
+    opacity: 1;
+    display: block;
+}
+
+.mp-donate-qr img {
+    width: 200px;
+    height: 200px;
+    object-fit: contain;
+}
