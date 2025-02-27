@@ -1,4 +1,5 @@
 import { App } from 'obsidian';
+import { templates } from './templates';
 
 interface Template {
     id: string;
@@ -56,40 +57,13 @@ export class TemplateManager {
 
     public async loadTemplates() {
         try {
-            const configDir = this.app.vault.configDir;
-            const templatesPath = `${configDir}/plugins/obsidian-to-mp/templates`;
-            
-            // 加载默认模板
-            const defaultTemplate = JSON.parse(
-                await this.app.vault.adapter.read(`${templatesPath}/default.json`)
-            );
-            this.templates.set(defaultTemplate.id, defaultTemplate);
-            this.currentTemplate = defaultTemplate;
-
-            // 加载极简主题
-            const minimalTemplate = JSON.parse(
-                await this.app.vault.adapter.read(`${templatesPath}/minimal.json`)
-            );
-            this.templates.set(minimalTemplate.id, minimalTemplate);
-
-            // 加载优雅主题
-            const elegantTemplate = JSON.parse(
-                await this.app.vault.adapter.read(`${templatesPath}/elegant.json`)
-            );
-            this.templates.set(elegantTemplate.id, elegantTemplate);
-
-            // 加载深色主题
-            const darkTemplate = JSON.parse(
-                await this.app.vault.adapter.read(`${templatesPath}/dark.json`)
-            );
-            this.templates.set(darkTemplate.id, darkTemplate);
-
-            // 加载学术主题
-            const academicTemplate = JSON.parse(
-                await this.app.vault.adapter.read(`${templatesPath}/academic.json`)
-            );
-            this.templates.set(academicTemplate.id, academicTemplate);
-            
+            // 直接从内置模板加载
+            Object.values(templates).forEach(template => {
+                this.templates.set(template.id, template);
+                if (template.id === 'default') {
+                    this.currentTemplate = template;
+                }
+            });
         } catch (error) {
             console.error('加载模板失败:', error);
             throw new Error('无法加载模板文件');

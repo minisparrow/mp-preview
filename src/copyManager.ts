@@ -58,7 +58,6 @@ export class CopyManager {
             container.style.left = '-9999px';
             container.innerHTML = element.innerHTML;
             document.body.appendChild(container);
-            console.log(element.innerHTML);
             // 处理图片转换为 base64
             await this.processImages(container);
 

@@ -3,7 +3,7 @@ import { MPView, VIEW_TYPE_MP } from './view';
 import { TemplateManager } from './templateManager';
 import { SettingsManager } from './settings';
 import { MPConverter } from './converter';
-
+import { DonateManager } from './donateManager';
 export default class MPPlugin extends Plugin {
     private settingsManager: SettingsManager;
 
