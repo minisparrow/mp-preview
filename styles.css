@@ -1,7 +1,13 @@
+/* 状态栏样式覆盖 */
+.workspace-leaf-content .view-content {
+    padding: 10px 10px 13px 10px;;
+}
+
 /* 工具栏基础样式 */
 .mp-toolbar, .mp-bottom-bar {
-    padding: 12px 32px;
+    padding: 20px 32px;
     position: sticky;
+    border-radius: 6px;
     z-index: 100;
     display: flex;
     align-items: center;
@@ -181,7 +187,7 @@
 .mp-preview-area {
     padding: 32px;
     margin: 20px;
-    height: calc(100% - 160px);
+    height: calc(100% - 180px);
     overflow-y: auto;
     background: white;
     flex: 1;
@@ -298,109 +304,205 @@
     border-color: #5C5F77 !important;
     box-shadow: none;
 }
-
+/* 关于作者的框 */
 .mp-donate-overlay {
     position: fixed;
     top: 0;
     left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 1000;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
     display: flex;
     align-items: center;
     justify-content: center;
+    z-index: 1000;
 }
 
-.mp-donate-modal {
+/* 弹框主体 */
+.mp-about-modal {
     background: white;
-    padding: 30px;
     border-radius: 12px;
-    width: 400px;
+    padding: 20px 20px;
+    width: 520px;
+    max-height: 90vh;
     position: relative;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    overflow-y: auto;
 }
 
+/* 自定义滚动条样式 */
+.mp-about-modal::-webkit-scrollbar {
+    width: 8px;
+}
+
+.mp-about-modal::-webkit-scrollbar-track {
+    background: #f5f5f5;
+    border-radius: 4px;
+}
+
+.mp-about-modal::-webkit-scrollbar-thumb {
+    background: #ddd;
+    border-radius: 4px;
+}
+
+.mp-about-modal::-webkit-scrollbar-thumb:hover {
+    background: #ccc;
+}
+
+/* 关闭按钮 */
 .mp-donate-close {
     position: absolute;
-    right: 15px;
-    top: 15px;
-    background: none;
+    top: 7px;
+    right: 7px;
+    width: 28px;
+    height: 28px;
+    background: transparent;
     border: none;
-    font-size: 24px;
+    border-radius: 6px;
+    font-size: 17px;
+    color: #bfbfbf;
     cursor: pointer;
-    color: #999;
-    padding: 5px;
-    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+/* macOS 系统下的样式 */
+@media screen and (-webkit-min-device-pixel-ratio: 0) and (min-color-index:0) {
+    .mp-donate-close {
+        right: auto;
+        left: 7px;
+    }
 }
 
 .mp-donate-close:hover {
-    color: #666;
-}
-
-.mp-donate-title {
-    margin: 0 0 20px;
-    text-align: center;
-    color: #333;
-    font-size: 1.5em;
-}
-
-.mp-donate-desc {
-    text-align: center;
-    color: #666;
-    margin-bottom: 20px;
-}
-
-.mp-donate-content {
-    text-align: center;
-}
-
-.mp-donate-tabs {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    margin-bottom: 20px;
-}
-
-.mp-donate-tab {
-    padding: 8px 20px;
-    border: none;
     background: #f5f5f5;
-    border-radius: 20px;
-    cursor: pointer;
-    color: #666;
-    transition: all 0.3s ease;
+    color: #595959;
 }
 
-.mp-donate-tab.active {
-    background: #4A90E2;
-    color: white;
+/* 内容区块 */
+.mp-about-section {
+    padding: 10px;
+    margin: 8px 20px 0 20px;
+    border-radius: 8px;
 }
 
-.mp-donate-qr-container {
-    position: relative;
-    width: 200px;
-    height: 200px;
-    margin: 0 auto;
+.mp-about-intro-section {
+    background: #fafafa;
+    border: 1px solid #f0f0f0;
 }
 
-.mp-donate-qr {
-    position: absolute;
-    top: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    display: none;
+.mp-about-donate-section {
+    background: #fff9f5;
+    border: 1px solid #ffe4d9;
 }
 
-.mp-donate-qr.active {
-    opacity: 1;
-    display: block;
+.mp-about-mp-section {
+    background: #f5fff7;
+    border: 1px solid #e6f7e9;
 }
 
-.mp-donate-qr img {
-    width: 200px;
-    height: 200px;
+/* 文字样式 */
+.mp-about-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #2c3e50;
+    margin: 0 0 1px;
+    text-align: center;
+    letter-spacing: 0.5px;
+}
+
+.mp-about-name {
+    color: #5290DC;
+    font-weight: 600;
+    font-size: 16px;
+    padding: 0 2px;
+}
+
+.mp-about-identity {
+    color: #34495e;
+    font-weight: 500;
+    background: rgba(8, 98, 209, 0.08);
+    padding: 0 4px;
+    border-radius: 3px;
+}
+
+.mp-about-highlight {
+    color: #e67e22;
+    font-weight: 500;
+}
+
+.mp-about-value {
+    color: #16a085;
+    font-weight: 500;
+}
+
+.mp-about-subtitle {
+    font-size: 18px;
+    color: #d35400;
+    margin: 8px 0 12px;
+    letter-spacing: 0.3px;
+    font-weight: 600;
+}
+
+.mp-about-intro {
+    font-size: 15px;
+    color: #2c3e50;
+    margin: 8px 0;
+    line-height: 1.8;
+    letter-spacing: 0.2px;
+}
+
+.mp-about-role, 
+.mp-about-desc {
+    font-size: 14.5px;
+    color: #34495e;
+    margin: 6px 0;
+    line-height: 1.8;
+    letter-spacing: 0.2px;
+}
+
+.mp-about-emphasis {
+    font-weight: 500;
+    color: #c0392b;
+}
+
+.mp-about-footer {
+    font-size: 15px;
+    color: #2c3e50;
+    text-align: center;
+    margin: 1px 0 0;
+    padding: 1px 1px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+    line-height: 1.6;
+}
+
+.mp-about-footer strong {
+    color: #8e44ad;
+    font-weight: 600;
+}
+/* 二维码容器 */
+.mp-about-qr {
+    width: 100%;
+    height: 150px;
+    margin: 5px 0;
+    padding: 5px;
+    background: white;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.mp-about-qr img {
+    width: 100%;
+    height: 100%;
     object-fit: contain;
 }

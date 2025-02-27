@@ -4,9 +4,6 @@
   "version": "1.0.0",
   "minAppVersion": "0.15.0",
   "description": "将 Obsidian 文章转换为微信公众号格式",
-  "author": "Your Name",
-  "isDesktopOnly": false,
-  "resources": [
-    "assets/**"
-  ]
+  "author": "夜半Yeban",
+  "isDesktopOnly": false
 }

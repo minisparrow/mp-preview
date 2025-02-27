@@ -218,7 +218,7 @@ export class MPView extends ItemView {
                 3. 实时预览效果
                 4. 点击【复制按钮】即可粘贴到公众号
                 5. 编辑实时查看效果，点🔓关闭实时刷新
-                6. 如果你喜欢这个插件，欢迎打赏`
+                6. 如果你喜欢这个插件，欢迎关注打赏`
         });
         // 创建中间控件容器
         const bottomControlsGroup = bottomBar.createEl('div', { cls: 'mp-bottom-controls-group' });
@@ -227,7 +227,7 @@ export class MPView extends ItemView {
         const likeButton = bottomControlsGroup.createEl('button', { 
             cls: 'mp-like-button'
         });
-        likeButton.innerHTML = '<span style="margin-right: 4px">☕️</span>喜欢作者';
+        likeButton.innerHTML = '<span style="margin-right: 4px">❤️</span>关于作者';
         likeButton.addEventListener('click', () => {
             DonateManager.showDonateModal(this.containerEl);
         });

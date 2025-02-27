@@ -4,11 +4,15 @@ const minimalTemplate = require('./minimal.json');
 const elegantTemplate = require('./elegant.json');
 const darkTemplate = require('./dark.json');
 const academicTemplate = require('./academic.json');
+const yebanTemplate = require('./yeban.json');
+const darkgreenTemplate = require('./darkgreen.json');
 
 export const templates = {
     default: defaultTemplate,
     minimal: minimalTemplate,
     elegant: elegantTemplate,
     dark: darkTemplate,
-    academic: academicTemplate
+    academic: academicTemplate,
+    yeban: yebanTemplate,
+    darkgreen: darkgreenTemplate
 };
