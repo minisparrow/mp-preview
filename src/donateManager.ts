@@ -1,6 +1,16 @@
+
+import { App, Plugin } from 'obsidian';
+
 export class DonateManager {
     private static overlay: HTMLElement;
     private static modal: HTMLElement;
+    private static app: App;
+    private static plugin: Plugin;
+
+    public static initialize(app: App, plugin: Plugin) {
+        this.app = app;
+        this.plugin = plugin;
+    }
 
     public static showDonateModal(container: HTMLElement) {
         this.overlay = container.createEl('div', {
@@ -39,12 +49,17 @@ export class DonateManager {
         const qrCode = qrContainer.createEl('div', {
             cls: 'mp-donate-qr active'
         });
+        
+        // 使用插件实例获取资源路径
+        const qrPath = this.app.vault.adapter.getResourcePath(`${this.plugin.manifest.dir}/assets/qrcode.png`);
+
         qrCode.createEl('img', {
             attr: {
-                src: './assets/qrcode.png',
+                src: qrPath,
                 alt: '公众号二维码'
             }
         });
+
 
         // 添加公众号名称
         content.createEl('p', {

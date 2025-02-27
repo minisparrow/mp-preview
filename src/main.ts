@@ -17,6 +17,8 @@ export default class MPPlugin extends Plugin {
         
         // 初始化转换器
         MPConverter.initialize(this.app);
+        
+        DonateManager.initialize(this.app, this);
 
         // 注册视图
         this.registerView(
@@ -37,7 +39,7 @@ export default class MPPlugin extends Plugin {
         this.app.workspace.onLayoutReady(() => {
             this.activateView();
         });
-        MPConverter.initialize(this.app);
+        
     }
 
     async onunload() {
