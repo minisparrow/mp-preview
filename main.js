@@ -425,7 +425,8 @@ var MPConverter = class {
     return table;
   }
   static processElements(container) {
-    if (!container) return;
+    if (!container)
+      return;
     container.querySelectorAll("strong, em").forEach((el) => {
       el.style.display = "inline";
     });
@@ -434,13 +435,15 @@ var MPConverter = class {
       el.style.textDecoration = "none";
     });
     container.querySelectorAll("table").forEach((el) => {
-      if (el === container.closest("table")) return;
+      if (el === container.closest("table"))
+        return;
       el.style.borderCollapse = "collapse";
       el.style.margin = "1em 0";
       el.style.width = "100%";
     });
     container.querySelectorAll("th, td").forEach((el) => {
-      if (el === container.closest("td")) return;
+      if (el === container.closest("td"))
+        return;
       el.style.border = "1px solid #dfdfdf";
       el.style.padding = "8px";
     });
@@ -496,7 +499,8 @@ var MPConverter = class {
       const originalSpan = el;
       const src = originalSpan.getAttribute("src");
       const alt = originalSpan.getAttribute("alt");
-      if (!src) return;
+      if (!src)
+        return;
       try {
         const linktext = src.split("|")[0];
         const file = this.app.metadataCache.getFirstLinkpathDest(linktext, "");
@@ -504,7 +508,8 @@ var MPConverter = class {
           const absolutePath = this.app.vault.adapter.getResourcePath(file.path);
           const newImg = document.createElement("img");
           newImg.src = absolutePath;
-          if (alt) newImg.alt = alt;
+          if (alt)
+            newImg.alt = alt;
           newImg.style.maxWidth = "100%";
           newImg.style.height = "auto";
           newImg.style.display = "block";
@@ -964,7 +969,8 @@ var MPView = class extends import_obsidian2.ItemView {
   }
   updatePreview() {
     return __async(this, null, function* () {
-      if (!this.currentFile) return;
+      if (!this.currentFile)
+        return;
       this.previewEl.empty();
       const content = yield this.app.vault.read(this.currentFile);
       yield import_obsidian2.MarkdownRenderer.renderMarkdown(
@@ -1120,7 +1126,8 @@ var TemplateManager = class {
     const styles = this.currentTemplate.styles;
     const table = element.querySelector("table");
     const td = element.querySelector("td");
-    if (!table || !td) return;
+    if (!table || !td)
+      return;
     table.setAttribute("style", styles.container);
     table.setAttribute("cellpadding", "0");
     table.setAttribute("cellspacing", "0");
@@ -1183,14 +1190,16 @@ var TemplateManager = class {
       el.setAttribute("style", styles.emphasis.del);
     });
     td.querySelectorAll("table").forEach((el) => {
-      if (el === table) return;
+      if (el === table)
+        return;
       el.setAttribute("style", styles.table.container);
     });
     td.querySelectorAll("th").forEach((el) => {
       el.setAttribute("style", `${styles.table.header}; font-family: ${this.currentFont}; font-size: ${this.currentFontSize}px;`);
     });
     td.querySelectorAll("td").forEach((el) => {
-      if (el === td) return;
+      if (el === td)
+        return;
       el.setAttribute("style", `${styles.table.cell}; font-family: ${this.currentFont}; font-size: ${this.currentFontSize}px;`);
     });
     td.querySelectorAll("hr").forEach((el) => {
