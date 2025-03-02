@@ -34,12 +34,6 @@ export default class MPPlugin extends Plugin {
                 await this.activateView();
             }
         });
-
-        // 插件加载时自动激活视图
-        this.app.workspace.onLayoutReady(() => {
-            this.activateView();
-        });
-        
     }
 
     async onunload() {

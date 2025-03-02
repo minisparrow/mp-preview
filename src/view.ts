@@ -352,8 +352,10 @@ export class MPView extends ItemView {
     async updatePreview() {
         if (!this.currentFile) return;
 
-        // 保存当前滚动位置
+        // 保存当前滚动位置和内容高度
         const scrollPosition = this.previewEl.scrollTop;
+        const prevHeight = this.previewEl.scrollHeight;
+        const isAtBottom = (this.previewEl.scrollHeight - this.previewEl.scrollTop) <= (this.previewEl.clientHeight + 100);
 
         this.previewEl.empty();
         const content = await this.app.vault.read(this.currentFile);
@@ -368,8 +370,17 @@ export class MPView extends ItemView {
         MPConverter.formatContent(this.previewEl);
         this.templateManager.applyTemplate(this.previewEl);
 
-        // 恢复滚动位置
-        this.previewEl.scrollTop = scrollPosition;
+        // 根据滚动位置决定是否自动滚动
+        if (isAtBottom) {
+            // 如果用户在底部附近，自动滚动到底部
+            requestAnimationFrame(() => {
+                this.previewEl.scrollTop = this.previewEl.scrollHeight;
+            });
+        } else {
+            // 否则保持原来的滚动位置
+            const heightDiff = this.previewEl.scrollHeight - prevHeight;
+            this.previewEl.scrollTop = scrollPosition + heightDiff;
+        }
     }
 
     // 添加自定义下拉选择器创建方法
