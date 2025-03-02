@@ -1,12 +1,12 @@
 {
-  "id": "obsidian-to-mp",
-  "name": "Obsidian to MP",
-  "version": "1.0.0",
-  "minAppVersion": "0.15.0",
-  "description": "将 Obsidian 文章转换为微信公众号格式",
-  "author": "夜半Yeban",
-  "isDesktopOnly": true,
-  "assets": [
-      "assets/*"
-  ]
+    "id": "mp-preview",
+    "name": "MP Preview",
+    "version": "1.0.0",
+    "minAppVersion": "0.15.0",
+    "description": "一键将 Markdown 文档转换为微信公众号格式",
+    "author": "夜半Yeban",
+    "isDesktopOnly": true,
+    "assets": [
+        "assets/*"
+    ]
 }

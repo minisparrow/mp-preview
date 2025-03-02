@@ -1,7 +1,7 @@
 {
-  "name": "obsidian-to-mp",
+  "name": "mp-preview",
   "version": "1.0.0",
-  "description": "Convert Obsidian markdown to WeChat MP format",
+  "description": "一键将 Markdown 文档转换为微信公众号格式",
   "main": "main.js",
   "scripts": {
     "dev": "node esbuild.config.mjs",
