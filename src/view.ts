@@ -352,10 +352,12 @@ export class MPView extends ItemView {
     async updatePreview() {
         if (!this.currentFile) return;
 
+        // 保存当前滚动位置
+        const scrollPosition = this.previewEl.scrollTop;
+
         this.previewEl.empty();
         const content = await this.app.vault.read(this.currentFile);
         
-        // 1. 先转换 Markdown 为 HTML
         await MarkdownRenderer.renderMarkdown(
             content,
             this.previewEl,
@@ -363,11 +365,11 @@ export class MPView extends ItemView {
             this
         );
 
-        // 2. 格式化内容 (只在内容更新时执行)
         MPConverter.formatContent(this.previewEl);
-
-        // 3. 应用模板样式
         this.templateManager.applyTemplate(this.previewEl);
+
+        // 恢复滚动位置
+        this.previewEl.scrollTop = scrollPosition;
     }
 
     // 添加自定义下拉选择器创建方法
