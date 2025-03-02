@@ -58,11 +58,15 @@ export class CopyManager {
             container.style.left = '-9999px';
             container.innerHTML = element.innerHTML;
             document.body.appendChild(container);
+            
             // 处理图片转换为 base64
             await this.processImages(container);
 
             // 清理 HTML
             const cleanHtml = this.cleanupHtml(container.innerHTML);
+            
+            // 打印最终的 HTML
+            console.log('最终复制的 HTML:', cleanHtml);
 
             // 创建剪贴板数据
             const clipData = new ClipboardItem({

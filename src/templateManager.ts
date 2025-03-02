@@ -7,10 +7,26 @@ interface Template {
     styles: {
         container: string;
         title: {
-            h1: string;
-            h2: string;
-            h3: string;
-            base: string;
+            h1: {
+                base: string;
+                content: string;
+                after: string;
+            };
+            h2: {
+                base: string;
+                content: string;
+                after: string;
+            };
+            h3: {
+                base: string;
+                content: string;
+                after: string;
+            };
+            base: {
+                base: string;
+                content: string;
+                after: string;
+            };
         };
         paragraph: string;
         list: {
@@ -103,14 +119,14 @@ export class TemplateManager {
         const styles = this.currentTemplate.styles;
         const table = element.querySelector('table');
         const td = element.querySelector('td');
-        
+
         if (!table || !td) return;
 
         // 应用容器样式到表格
         table.setAttribute('style', styles.container);
         table.setAttribute('cellpadding', '0');
         table.setAttribute('cellspacing', '0');
-        
+
         // 应用基础样式到单元格
         td.style.cssText = `
             word-break: break-all;
@@ -122,19 +138,32 @@ export class TemplateManager {
             border: none;
             font-family: ${this.currentFont};
         `;
-        
+
         // 应用标题样式
-        td.querySelectorAll('h1').forEach(el => {
-            el.setAttribute('style', `${styles.title.h1}; font-family: ${this.currentFont};`);
-        });
-        td.querySelectorAll('h2').forEach(el => {
-            el.setAttribute('style', `${styles.title.h2}; font-family: ${this.currentFont};`);
-        });
-        td.querySelectorAll('h3').forEach(el => {
-            el.setAttribute('style', `${styles.title.h3}; font-family: ${this.currentFont};`);
-        });
-        td.querySelectorAll('h4, h5, h6').forEach(el => {
-            el.setAttribute('style', `${styles.title.base}; font-family: ${this.currentFont};`);
+        ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'].forEach(tag => {
+            td.querySelectorAll(tag).forEach(el => {
+                // 检查是否已经处理过
+                if (!el.querySelector('.content')) {
+                    const content = document.createElement('span');
+                    content.className = 'content';
+                    content.innerHTML = el.innerHTML;
+                    el.innerHTML = '';
+                    el.appendChild(content);
+
+                    const after = document.createElement('span');
+                    after.className = 'after';
+                    el.appendChild(after);
+                }
+
+                // 根据标签选择对应的样式
+                const styleKey = (tag === 'h4' || tag === 'h5' || tag === 'h6' ? 'base' : tag) as keyof typeof styles.title;
+                const titleStyle = styles.title[styleKey];
+
+                // 应用样式
+                el.setAttribute('style', `${titleStyle.base}; font-family: ${this.currentFont};`);
+                el.querySelector('.content')?.setAttribute('style', titleStyle.content);
+                el.querySelector('.after')?.setAttribute('style', titleStyle.after);
+            });
         });
 
         // 应用段落样式
@@ -216,7 +245,7 @@ export class TemplateManager {
             const img = el as HTMLImageElement;
             // 应用基础样式
             el.setAttribute('style', `${styles.image}; font-family: ${this.currentFont};`);
-            
+
             // 如果图片是段落中唯一的元素，才设置居中
             const parent = img.parentElement;
             if (parent && parent.tagName.toLowerCase() === 'p') {
