@@ -1398,6 +1398,8 @@ var MPView = class extends import_obsidian2.ItemView {
       if (!this.currentFile)
         return;
       const scrollPosition = this.previewEl.scrollTop;
+      const prevHeight = this.previewEl.scrollHeight;
+      const isAtBottom = this.previewEl.scrollHeight - this.previewEl.scrollTop <= this.previewEl.clientHeight + 100;
       this.previewEl.empty();
       const content = yield this.app.vault.read(this.currentFile);
       yield import_obsidian2.MarkdownRenderer.renderMarkdown(
@@ -1408,7 +1410,14 @@ var MPView = class extends import_obsidian2.ItemView {
       );
       MPConverter.formatContent(this.previewEl);
       this.templateManager.applyTemplate(this.previewEl);
-      this.previewEl.scrollTop = scrollPosition;
+      if (isAtBottom) {
+        requestAnimationFrame(() => {
+          this.previewEl.scrollTop = this.previewEl.scrollHeight;
+        });
+      } else {
+        const heightDiff = this.previewEl.scrollHeight - prevHeight;
+        this.previewEl.scrollTop = scrollPosition + heightDiff;
+      }
     });
   }
   // 添加自定义下拉选择器创建方法
