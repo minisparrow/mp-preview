@@ -697,38 +697,38 @@ var require_yeban_navy = __commonJS({
         title: {
           h1: {
             base: "margin: 32px 0 0; font-size: 2em; letter-spacing: -0.03em; line-height: 1.5; text-align: center;",
-            content: "font-weight: bold; color: #1E90FF; display: inline-block; border-bottom: 1px solid #1E90FF;",
+            content: "font-weight: bold; color: #4682B4; display: inline-block; border-bottom: 1px solid #4682B4;",
             after: ""
           },
           h2: {
-            base: "margin: 28px 0 0; font-size: 1.5em; letter-spacing: -0.02em; line-height: 1.5; border-bottom: 1px solid rgba(30,144,255,0.2);",
-            content: "font-weight: bold; color: #ffffff; background: #1E90FF; padding: 1px 4px; border-radius: 3px;",
+            base: "margin: 28px 0 0; font-size: 1.5em; letter-spacing: -0.02em; line-height: 1.5; border-bottom: 1px solid rgba(70,130,180,0.2);",
+            content: "font-weight: bold; color: #ffffff; background: #4682B4; padding: 1px 4px; border-radius: 3px;",
             after: ""
           },
           h3: {
             base: "margin: 24px 0 0; font-size: 1.25em; letter-spacing: -0.01em; line-height: 1.5;",
-            content: "font-weight: bold; color: #3B9DFF; padding: 1px 1px;",
+            content: "font-weight: bold; color: #5B97C9; padding: 1px 1px;",
             after: ""
           },
           base: {
             base: "margin: 20px 0 0; font-size: 1em;",
-            content: "font-weight: bold; color: #57A9FF;",
+            content: "font-weight: bold; color: #6FA8D6;",
             after: ""
           }
         },
-        paragraph: "line-height: 1.8; margin-bottom: 1.2em; font-size: 1em; color: #4a4a4a;",
+        paragraph: "line-height: 2; margin-bottom: 24px; font-size: 1em; color: #3f3f3f; letter-spacing: 0.7px; text-align: justify; padding: 0 8px;",
         list: {
-          container: "padding-left: 32px; margin-bottom: 1.2em; color: #4a4a4a;",
-          item: "margin-bottom: 0.6em; font-size: 1em; color: #4a4a4a; line-height: 1.8;",
-          taskList: "list-style: none; margin-left: -24px; font-size: 1em; color: #4a4a4a; line-height: 1.8;"
+          container: "padding-left: 32px; margin-bottom: 24px; color: #3f3f3f;",
+          item: "margin-bottom: 0.6em; font-size: 1em; color: #3f3f3f; line-height: 2; letter-spacing: 0.7px; text-align: justify; padding: 0 8px;",
+          taskList: "list-style: none; margin-left: -24px; font-size: 1em; color: #3f3f3f; line-height: 2; letter-spacing: 0.7px; text-align: justify; padding: 0 8px;"
         },
         code: {
           block: "background: #F8FBFF; padding: 0.5em 1em 1em; border-radius: 8px; font-size: 14px; font-family: Operator Mono, Consolas, Monaco, Menlo, monospace; line-height: 1.6; white-space: pre; overflow-x: auto; word-wrap: normal; color: #333; margin: 1.2em 0; border: 1px solid #E6F0FF; box-shadow: 0 2px 4px rgba(0,0,128,0.05); width: 100%;",
           inline: "background: #F8FBFF; padding: 2px 6px; border-radius: 4px; color: #333; font-size: 14px; font-family: Operator Mono, Consolas, Monaco, Menlo, monospace; border: 1px solid #E6F0FF;"
         },
-        quote: "border-left: 4px solid #000080; border-radius: 6px; padding: 16px 20px; background: #F8FBFF; margin: 0.8em 0; color: #1E3799; font-style: italic; font-size: 1em; word-wrap: break-word;",
+        quote: "border-left: 4px solid #4682B4; border-radius: 6px; padding: 16px 20px; background: #F8FBFF; margin: 0.8em 0; color: #4682B4; font-style: italic; font-size: 1em; word-wrap: break-word;",
+        link: "color: #4682B4; text-decoration: none; border-bottom: 1px solid #4682B4; transition: all 0.2s ease;",
         image: "max-width: 100%; height: auto; margin: 1em auto; display: block;",
-        link: "color: #000080; text-decoration: none; border-bottom: 1px solid #000080; transition: all 0.2s ease;",
         emphasis: {
           strong: "font-weight: bold; color: #4a4a4a;",
           em: "font-style: italic; color: #4a4a4a;",
