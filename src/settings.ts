@@ -2,12 +2,14 @@ interface MPSettings {
     templateId: string;
     fontFamily: string;
     fontSize: number;
+    backgroundId: string;
 }
 
 const DEFAULT_SETTINGS: MPSettings = {
     templateId: 'default',
     fontFamily: '-apple-system',
-    fontSize: 16
+    fontSize: 16,
+    backgroundId: ''
 };
 
 export class SettingsManager {

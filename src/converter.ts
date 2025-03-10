@@ -8,33 +8,17 @@ export class MPConverter {
     }
 
     static formatContent(element: HTMLElement): void {
-        // 创建表格包裹
-        const table = this.createWrapperTable(element);
-        
-        // 处理各种 Markdown 元素
-        this.processElements(table.querySelector('td'));
-    }
-
-    private static createWrapperTable(element: HTMLElement): HTMLTableElement {
-        const table = document.createElement('table');
-        const tbody = document.createElement('tbody');
-        const tr = document.createElement('tr');
-        const td = document.createElement('td');
-
-        table.style.width = '100%';
-        table.style.borderCollapse = 'collapse';
-        td.style.wordBreak = 'break-all';
-
+        // 创建 section 容器
+        const section = document.createElement('section');
+        section.className = 'mp-content-section';
+        // 移动原有内容到 section 中
         while (element.firstChild) {
-            td.appendChild(element.firstChild);
+            section.appendChild(element.firstChild);
         }
+        element.appendChild(section);
 
-        tr.appendChild(td);
-        tbody.appendChild(tr);
-        table.appendChild(tbody);
-        element.appendChild(table);
-
-        return table;
+        // 处理元素
+        this.processElements(section);
     }
 
     private static processElements(container: HTMLElement | null): void {

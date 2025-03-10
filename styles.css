@@ -64,7 +64,7 @@
 /* 下拉选择器 */
 .custom-select-container {
     position: relative;
-    width: 150px;
+    width: 120px;
 }
 
 .custom-select {
@@ -139,7 +139,7 @@
 
 /* 字号调整组件 */
 .mp-font-size-group {
-    width: 150px;
+    width: 120px;
     flex-shrink: 0;
     display: flex;
     align-items: center;
@@ -185,8 +185,8 @@
 
 /* 预览区域 */
 .mp-preview-area {
-    padding: 32px;
-    margin: 20px;
+    padding: 10px 20px 20px 20px;
+    margin: 10px;
     height: calc(100% - 180px);
     overflow-y: auto;
     background: white;
@@ -253,7 +253,7 @@
 /* 底部按钮 */
 .mp-bottom-controls-group button {
     padding: 8px 24px;
-    width: 150px;
+    width: 164px;
     height: 36px;
     border-radius: 8px;
     border: 1px solid #5C5F77;

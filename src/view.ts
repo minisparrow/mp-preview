@@ -4,6 +4,7 @@ import { CopyManager } from './copyManager';
 import type { TemplateManager } from './templateManager';
 import { DonateManager } from './donateManager';
 import type { SettingsManager } from './settings';
+import { BackgroundManager } from './backgroundManager';
 export const VIEW_TYPE_MP = 'mp-preview';
 
 export class MPView extends ItemView {
@@ -18,6 +19,8 @@ export class MPView extends ItemView {
     private customTemplateSelect: HTMLElement;
     private customFontSelect: HTMLElement;
     private fontSizeSelect: HTMLInputElement;
+    private backgroundManager: BackgroundManager;
+    private customBackgroundSelect: HTMLElement;
 
     constructor(
         leaf: WorkspaceLeaf, 
@@ -27,6 +30,7 @@ export class MPView extends ItemView {
         super(leaf);
         this.templateManager = templateManager;
         this.settingsManager = settingsManager;
+        this.backgroundManager = new BackgroundManager();
     }
 
     getViewType() {
@@ -58,6 +62,31 @@ export class MPView extends ItemView {
     
         // 创建中间控件容器
         const controlsGroup = toolbar.createEl('div', { cls: 'mp-controls-group' });
+        
+        // 添加背景选择器
+        const backgroundOptions = [
+            { value: '', label: '无背景' },
+            ...(this.backgroundManager.getAllBackgrounds()?.map(bg => ({
+                value: bg.id,
+                label: bg.name
+            })) || [])
+        ];
+        
+        this.customBackgroundSelect = this.createCustomSelect(
+            controlsGroup,
+            'mp-background-select',
+            backgroundOptions
+        );
+        
+        // 添加背景选择器的事件监听
+        this.customBackgroundSelect.querySelector('.custom-select')?.addEventListener('change', async (e: any) => {
+            const value = e.detail.value;
+            this.backgroundManager.setBackground(value);
+            await this.settingsManager.updateSettings({
+                backgroundId: value
+            });
+            this.backgroundManager.applyBackground(this.previewEl);
+        });
         
         // 创建自定义下拉选择器
         this.customTemplateSelect = this.createCustomSelect(
@@ -115,6 +144,27 @@ export class MPView extends ItemView {
         // 从设置中恢复上次的选择
         const settings = this.settingsManager.getSettings();
         
+        // 恢复背景设置
+        if (settings.backgroundId) {
+            const backgroundSelect = this.customBackgroundSelect.querySelector('.selected-text');
+            const backgroundDropdown = this.customBackgroundSelect.querySelector('.select-dropdown');
+            if (backgroundSelect && backgroundDropdown) {
+                const option = backgroundOptions.find(o => o.value === settings.backgroundId);
+                if (option) {
+                    backgroundSelect.textContent = option.label;
+                    this.customBackgroundSelect.querySelector('.custom-select')?.setAttribute('data-value', option.value);
+                    backgroundDropdown.querySelectorAll('.select-item').forEach(el => {
+                        if (el.getAttribute('data-value') === option.value) {
+                            el.classList.add('selected');
+                        } else {
+                            el.classList.remove('selected');
+                        }
+                    });
+                }
+            }
+            this.backgroundManager.setBackground(settings.backgroundId);
+        }
+
         // 恢复设置
         if (settings.templateId) {
             const templateSelect = this.customTemplateSelect.querySelector('.selected-text');
@@ -369,7 +419,7 @@ export class MPView extends ItemView {
 
         MPConverter.formatContent(this.previewEl);
         this.templateManager.applyTemplate(this.previewEl);
-
+        this.backgroundManager.applyBackground(this.previewEl);
         // 根据滚动位置决定是否自动滚动
         if (isAtBottom) {
             // 如果用户在底部附近，自动滚动到底部

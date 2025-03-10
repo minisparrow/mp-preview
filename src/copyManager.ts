@@ -65,9 +65,6 @@ export class CopyManager {
             // 清理 HTML
             const cleanHtml = this.cleanupHtml(container.innerHTML);
             
-            // 打印最终的 HTML
-            console.log('最终复制的 HTML:', cleanHtml);
-
             // 创建剪贴板数据
             const clipData = new ClipboardItem({
                 'text/html': new Blob([cleanHtml], { type: 'text/html' }),
