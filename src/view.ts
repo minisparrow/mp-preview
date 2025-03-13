@@ -334,23 +334,22 @@ export class MPView extends ItemView {
 
     private updateControlsState(enabled: boolean) {
         this.lockButton.disabled = !enabled;
-        // 更新自定义选择器的禁用状态
+        // 更新所有自定义选择器的禁用状态
         const templateSelect = this.customTemplateSelect.querySelector('.custom-select');
         const fontSelect = this.customFontSelect.querySelector('.custom-select');
-        if (templateSelect) {
-            templateSelect.classList.toggle('disabled', !enabled);
-            // 使用setAttribute来设置style属性
-            templateSelect.setAttribute('style', `pointer-events: ${enabled ? 'auto' : 'none'}`);
-        }
-        if (fontSelect) {
-            fontSelect.classList.toggle('disabled', !enabled);
-            // 使用setAttribute来设置style属性
-            fontSelect.setAttribute('style', `pointer-events: ${enabled ? 'auto' : 'none'}`);
-        }
+        const backgroundSelect = this.customBackgroundSelect.querySelector('.custom-select');
+        
+        [templateSelect, fontSelect, backgroundSelect].forEach(select => {
+            if (select) {
+                select.classList.toggle('disabled', !enabled);
+                select.setAttribute('style', `pointer-events: ${enabled ? 'auto' : 'none'}`);
+            }
+        });
+        
         this.fontSizeSelect.disabled = !enabled;
         this.copyButton.disabled = !enabled;
         
-        // 添加字号调节按钮的状态控制
+        // 字号调节按钮的状态控制
         const fontSizeButtons = this.containerEl.querySelectorAll('.mp-font-size-btn');
         fontSizeButtons.forEach(button => {
             (button as HTMLButtonElement).disabled = !enabled;
