@@ -134,10 +134,13 @@ export class TemplateManager {
                 if (!el.querySelector('.content')) {
                     const content = document.createElement('span');
                     content.className = 'content';
-                    content.innerHTML = el.innerHTML;
-                    el.innerHTML = '';
+                    // 使用 textContent 替代 innerHTML
+                    while (el.firstChild) {
+                        content.appendChild(el.firstChild);
+                    }
+                    el.textContent = '';
                     el.appendChild(content);
-
+                    
                     const after = document.createElement('span');
                     after.className = 'after';
                     el.appendChild(after);

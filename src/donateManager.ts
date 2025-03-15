@@ -40,8 +40,14 @@ export class DonateManager {
         const introEl = authorSection.createEl('p', {
             cls: 'mp-about-intro'
         });
-        introEl.innerHTML = '你好，我是<span class="mp-about-name">【夜半】</span>，一名<span class="mp-about-identity">全职写作与独立开发者</span>。';
         
+        // 使用 createEl 替代 innerHTML
+        introEl.createSpan({ text: '你好，我是' });
+        introEl.createSpan({ text: '【夜半】', cls: 'mp-about-name' });
+        introEl.createSpan({ text: '，一名' });
+        introEl.createSpan({ text: '全职写作与独立开发者', cls: 'mp-about-identity' });
+        introEl.createSpan({ text: '。' });
+
         const roleList = authorSection.createEl('div', {
             cls: 'mp-about-roles'
         });
@@ -49,17 +55,29 @@ export class DonateManager {
         const roleEl = roleList.createEl('p', {
             cls: 'mp-about-role'
         });
-        roleEl.innerHTML = `这款插件是我为了在 Obsidian 写作后，<br>
-                            无需繁琐排版一键即可发布到公众号而开发的工具，<br>
-                            希望能让你的<span class="mp-about-highlight">排版更轻松</span>，
-                            让你的<span class="mp-about-value">创作更高效</span>。`;
+        
+        // 使用 createEl 和 createSpan 替代 innerHTML
+        roleEl.createSpan({ text: '这款插件是我为了在 Obsidian 写作后，' });
+        roleEl.createEl('br');
+        roleEl.createSpan({ text: '无需繁琐排版一键即可发布到公众号而开发的工具，' });
+        roleEl.createEl('br');
+        roleEl.createSpan({ text: '希望能让你的' });
+        roleEl.createSpan({ text: '排版更轻松', cls: 'mp-about-highlight' });
+        roleEl.createSpan({ text: '，让你的' });
+        roleEl.createSpan({ text: '创作更高效', cls: 'mp-about-value' });
+        roleEl.createSpan({ text: '。' });
 
         // 添加插件介绍
         const descEl = authorSection.createEl('p', {
             cls: 'mp-about-desc'
         });
-        descEl.innerHTML = `如果这款插件对你有帮助，<br>或者你愿意支持我的独立开发与写作，欢迎请我喝咖啡☕️。<br>
-                            你的支持对我来说意义重大，它能让我更专注地开发、写作。`;
+        
+        // 使用 createEl 替代 innerHTML
+        descEl.createSpan({ text: '如果这款插件对你有帮助，' });
+        descEl.createEl('br');
+        descEl.createSpan({ text: '或者你愿意支持我的独立开发与写作，欢迎请我喝咖啡☕️。' });
+        descEl.createEl('br');
+        descEl.createSpan({ text: '你的支持来说意义重大，它能让我更专注地开发、写作。' });
 
         // 添加打赏区域
         const donateSection = this.modal.createEl('div', {
@@ -89,8 +107,11 @@ export class DonateManager {
         const mpDescEl = mpSection.createEl('p', {
             cls: 'mp-about-desc'
         });
-        mpDescEl.innerHTML = `如果你想了解更多关于创作、效率工具的小技巧，<br>
-                              或者关注我未来的写作动态，欢迎关注我的微信公众号。`;
+        
+        // 使用 createEl 替代 innerHTML
+        mpDescEl.createSpan({ text: '如果你想了解更多关于创作、效率工具的小技巧，' });
+        mpDescEl.createEl('br');
+        mpDescEl.createSpan({ text: '或者关注我未来的写作动态，欢迎关注我的微信公众号。' });
 
         mpSection.createEl('h4', {
             text: '微信公众号',
@@ -110,7 +131,12 @@ export class DonateManager {
         const footerEl = mpSection.createEl('p', {
             cls: 'mp-about-footer'
         });
-        footerEl.innerHTML = '期待与你一起，在创作的世界里<strong>找到属于自己的意义</strong>。';
+        
+        // 使用 createEl 替代 innerHTML
+        footerEl.createSpan({ text: '期待与你一起，在创作的世界里' });
+        const strongText = footerEl.createEl('strong');
+        strongText.createSpan({ text: '找到属于自己的意义' });
+        footerEl.createSpan({ text: '。' });
 
         // 添加关闭事件
         closeButton.addEventListener('click', () => this.closeDonateModal());
