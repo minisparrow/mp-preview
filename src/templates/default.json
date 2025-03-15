@@ -2,7 +2,7 @@
     "id": "default",
     "name": "默认模板",
     "styles": {
-        "container": "width: 100% !important; table-layout: fixed; border-collapse: collapse; border: none; margin: 0; padding: 0; max-width: 100vw;",
+        "container": "",
         "title": {
             "h1": {
                 "base": "margin: 32px 0 0; font-size: 2em; letter-spacing: -0.02em; line-height: 1.5;",

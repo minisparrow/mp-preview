@@ -4,6 +4,7 @@ import { CopyManager } from './copyManager';
 import type { TemplateManager } from './templateManager';
 import { DonateManager } from './donateManager';
 import type { SettingsManager } from './settings';
+import { BackgroundManager } from './backgroundManager';
 export const VIEW_TYPE_MP = 'mp-preview';
 
 export class MPView extends ItemView {
@@ -18,6 +19,8 @@ export class MPView extends ItemView {
     private customTemplateSelect: HTMLElement;
     private customFontSelect: HTMLElement;
     private fontSizeSelect: HTMLInputElement;
+    private backgroundManager: BackgroundManager;
+    private customBackgroundSelect: HTMLElement;
 
     constructor(
         leaf: WorkspaceLeaf, 
@@ -27,6 +30,7 @@ export class MPView extends ItemView {
         super(leaf);
         this.templateManager = templateManager;
         this.settingsManager = settingsManager;
+        this.backgroundManager = new BackgroundManager();
     }
 
     getViewType() {
@@ -41,7 +45,6 @@ export class MPView extends ItemView {
        return 'eye';
     }
 
-    // 在 onOpen 方法中更新底部锁定按钮的创建
     async onOpen() {
         const container = this.containerEl.children[1];
         container.empty();
@@ -51,13 +54,38 @@ export class MPView extends ItemView {
         // 锁定按钮
         this.lockButton = toolbar.createEl('button', {
             cls: 'mp-lock-button',
+            text: '🔓',
             attr: { 'aria-label': '关闭实时预览状态' }
         });
-        this.lockButton.innerHTML = '🔓';
         this.lockButton.addEventListener('click', () => this.togglePreviewLock());
     
         // 创建中间控件容器
         const controlsGroup = toolbar.createEl('div', { cls: 'mp-controls-group' });
+        
+        // 添加背景选择器
+        const backgroundOptions = [
+            { value: '', label: '无背景' },
+            ...(this.backgroundManager.getAllBackgrounds()?.map(bg => ({
+                value: bg.id,
+                label: bg.name
+            })) || [])
+        ];
+        
+        this.customBackgroundSelect = this.createCustomSelect(
+            controlsGroup,
+            'mp-background-select',
+            backgroundOptions
+        );
+        
+        // 添加背景选择器的事件监听
+        this.customBackgroundSelect.querySelector('.custom-select')?.addEventListener('change', async (e: any) => {
+            const value = e.detail.value;
+            this.backgroundManager.setBackground(value);
+            await this.settingsManager.updateSettings({
+                backgroundId: value
+            });
+            this.backgroundManager.applyBackground(this.previewEl);
+        });
         
         // 创建自定义下拉选择器
         this.customTemplateSelect = this.createCustomSelect(
@@ -93,6 +121,7 @@ export class MPView extends ItemView {
             this.templateManager.applyTemplate(this.previewEl);
         });
         this.customFontSelect.id = 'font-select';
+
         // 字号调整
         const fontSizeGroup = controlsGroup.createEl('div', { cls: 'mp-font-size-group' });
         const decreaseButton = fontSizeGroup.createEl('button', { 
@@ -115,6 +144,27 @@ export class MPView extends ItemView {
         // 从设置中恢复上次的选择
         const settings = this.settingsManager.getSettings();
         
+        // 恢复背景设置
+        if (settings.backgroundId) {
+            const backgroundSelect = this.customBackgroundSelect.querySelector('.selected-text');
+            const backgroundDropdown = this.customBackgroundSelect.querySelector('.select-dropdown');
+            if (backgroundSelect && backgroundDropdown) {
+                const option = backgroundOptions.find(o => o.value === settings.backgroundId);
+                if (option) {
+                    backgroundSelect.textContent = option.label;
+                    this.customBackgroundSelect.querySelector('.custom-select')?.setAttribute('data-value', option.value);
+                    backgroundDropdown.querySelectorAll('.select-item').forEach(el => {
+                        if (el.getAttribute('data-value') === option.value) {
+                            el.classList.add('selected');
+                        } else {
+                            el.classList.remove('selected');
+                        }
+                    });
+                }
+            }
+            this.backgroundManager.setBackground(settings.backgroundId);
+        }
+
         // 恢复设置
         if (settings.templateId) {
             const templateSelect = this.customTemplateSelect.querySelector('.selected-text');
@@ -123,10 +173,8 @@ export class MPView extends ItemView {
                 const option = await this.getTemplateOptions();
                 const selected = option.find(o => o.value === settings.templateId);
                 if (selected) {
-                    // 更新选中文本和值
                     templateSelect.textContent = selected.label;
                     this.customTemplateSelect.querySelector('.custom-select')?.setAttribute('data-value', selected.value);
-                    // 更新下拉列表中的选中状态
                     templateDropdown.querySelectorAll('.select-item').forEach(el => {
                         if (el.getAttribute('data-value') === selected.value) {
                             el.classList.add('selected');
@@ -146,10 +194,8 @@ export class MPView extends ItemView {
                 const option = this.getFontOptions();
                 const selected = option.find(o => o.value === settings.fontFamily);
                 if (selected) {
-                    // 更新选中文本和值
                     fontSelect.textContent = selected.label;
                     this.customFontSelect.querySelector('.custom-select')?.setAttribute('data-value', selected.value);
-                    // 更新下拉列表中的选中状态
                     fontDropdown.querySelectorAll('.select-item').forEach(el => {
                         if (el.getAttribute('data-value') === selected.value) {
                             el.classList.add('selected');
@@ -205,9 +251,9 @@ export class MPView extends ItemView {
         // 添加使用说明按钮
         const helpButton = bottomBar.createEl('button', {
             cls: 'mp-help-button',
+            text: '❓',
             attr: { 'aria-label': '使用指南' }
         });
-        helpButton.innerHTML = '❓';
         
         // 创建提示框
         const tooltip = bottomBar.createEl('div', {
@@ -220,6 +266,7 @@ export class MPView extends ItemView {
                 5. 编辑实时查看效果，点🔓关闭实时刷新
                 6. 如果你喜欢这个插件，欢迎关注打赏`
         });
+
         // 创建中间控件容器
         const bottomControlsGroup = bottomBar.createEl('div', { cls: 'mp-bottom-controls-group' });
         
@@ -227,7 +274,12 @@ export class MPView extends ItemView {
         const likeButton = bottomControlsGroup.createEl('button', { 
             cls: 'mp-like-button'
         });
-        likeButton.innerHTML = '<span style="margin-right: 4px">❤️</span>关于作者';
+        const heartSpan = likeButton.createEl('span', {
+            text: '❤️',
+            attr: { style: 'margin-right: 4px' }
+        });
+        likeButton.createSpan({ text: '关于作者' });
+        
         likeButton.addEventListener('click', () => {
             DonateManager.showDonateModal(this.containerEl);
         });
@@ -284,23 +336,22 @@ export class MPView extends ItemView {
 
     private updateControlsState(enabled: boolean) {
         this.lockButton.disabled = !enabled;
-        // 更新自定义选择器的禁用状态
+        // 更新所有自定义选择器的禁用状态
         const templateSelect = this.customTemplateSelect.querySelector('.custom-select');
         const fontSelect = this.customFontSelect.querySelector('.custom-select');
-        if (templateSelect) {
-            templateSelect.classList.toggle('disabled', !enabled);
-            // 使用setAttribute来设置style属性
-            templateSelect.setAttribute('style', `pointer-events: ${enabled ? 'auto' : 'none'}`);
-        }
-        if (fontSelect) {
-            fontSelect.classList.toggle('disabled', !enabled);
-            // 使用setAttribute来设置style属性
-            fontSelect.setAttribute('style', `pointer-events: ${enabled ? 'auto' : 'none'}`);
-        }
+        const backgroundSelect = this.customBackgroundSelect.querySelector('.custom-select');
+        
+        [templateSelect, fontSelect, backgroundSelect].forEach(select => {
+            if (select) {
+                select.classList.toggle('disabled', !enabled);
+                select.setAttribute('style', `pointer-events: ${enabled ? 'auto' : 'none'}`);
+            }
+        });
+        
         this.fontSizeSelect.disabled = !enabled;
         this.copyButton.disabled = !enabled;
         
-        // 添加字号调节按钮的状态控制
+        // 字号调节按钮的状态控制
         const fontSizeButtons = this.containerEl.querySelectorAll('.mp-font-size-btn');
         fontSizeButtons.forEach(button => {
             (button as HTMLButtonElement).disabled = !enabled;
@@ -321,7 +372,7 @@ export class MPView extends ItemView {
 
         this.updateControlsState(true);
         this.isPreviewLocked = false;
-        this.lockButton.innerHTML = '🔓';
+        this.lockButton.setText('🔓');
         await this.updatePreview();
     }
 
@@ -329,7 +380,7 @@ export class MPView extends ItemView {
         this.isPreviewLocked = !this.isPreviewLocked;
         const lockIcon = this.isPreviewLocked ? '🔒' : '🔓';
         const lockStatus = this.isPreviewLocked ? '开启实时预览状态' : '关闭实时预览状态';
-        this.lockButton.innerHTML = lockIcon;
+        this.lockButton.setText(lockIcon);
         this.lockButton.setAttribute('aria-label', lockStatus);
         
         if (!this.isPreviewLocked) {
@@ -369,6 +420,7 @@ export class MPView extends ItemView {
 
         MPConverter.formatContent(this.previewEl);
         this.templateManager.applyTemplate(this.previewEl);
+        this.backgroundManager.applyBackground(this.previewEl);
 
         // 根据滚动位置决定是否自动滚动
         if (isAtBottom) {

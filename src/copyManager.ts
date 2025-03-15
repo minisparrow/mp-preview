@@ -4,7 +4,9 @@ export class CopyManager {
     private static cleanupHtml(html: string): string {
         // 创建一个临时的 div 元素来处理 HTML
         const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = html;
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        tempDiv.append(...Array.from(doc.body.childNodes));
 
         // 移除所有的 data-* 属性
         tempDiv.querySelectorAll('*').forEach(el => {
@@ -56,7 +58,10 @@ export class CopyManager {
             const container = document.createElement('div');
             container.style.position = 'absolute';
             container.style.left = '-9999px';
-            container.innerHTML = element.innerHTML;
+            
+            // 使用 cloneNode 复制内容
+            const clone = element.cloneNode(true);
+            container.append(clone);
             document.body.appendChild(container);
             
             // 处理图片转换为 base64
@@ -65,9 +70,6 @@ export class CopyManager {
             // 清理 HTML
             const cleanHtml = this.cleanupHtml(container.innerHTML);
             
-            // 打印最终的 HTML
-            console.log('最终复制的 HTML:', cleanHtml);
-
             // 创建剪贴板数据
             const clipData = new ClipboardItem({
                 'text/html': new Blob([cleanHtml], { type: 'text/html' }),
