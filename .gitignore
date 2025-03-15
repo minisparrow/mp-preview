@@ -5,6 +5,7 @@ node_modules/
 dist/
 main.js
 data.json
+
 # 操作系统文件
 .DS_Store
 Thumbs.db

@@ -421,7 +421,7 @@ export class MPView extends ItemView {
         MPConverter.formatContent(this.previewEl);
         this.templateManager.applyTemplate(this.previewEl);
         this.backgroundManager.applyBackground(this.previewEl);
-        
+
         // 根据滚动位置决定是否自动滚动
         if (isAtBottom) {
             // 如果用户在底部附近，自动滚动到底部
