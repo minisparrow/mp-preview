@@ -11,6 +11,7 @@ const yebanOrangeTemplate = require('./yeban-orange.json');
 const yebanScarletTemplate = require('./yeban-scarlet.json');
 const yebanNavyTemplate = require('./yeban-navy.json');
 const darkgreenTemplate = require('./darkgreen.json');
+const brownTemplate = require('./brown.json');
 
 export const templates = {
     default: defaultTemplate,
@@ -24,5 +25,6 @@ export const templates = {
     'yeban-orange': yebanOrangeTemplate,
     'yeban-scarlet': yebanScarletTemplate,
     'yeban-navy': yebanNavyTemplate,
-    darkgreen: darkgreenTemplate
+    darkgreen: darkgreenTemplate,
+    brown: brownTemplate,
 };
