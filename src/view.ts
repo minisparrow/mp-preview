@@ -48,6 +48,8 @@ export class MPView extends ItemView {
     async onOpen() {
         const container = this.containerEl.children[1];
         container.empty();
+        container.classList.remove('view-content');
+        container.classList.add('mp-view-content');
         
         const toolbar = container.createEl('div', { cls: 'mp-toolbar' });
         
@@ -241,7 +243,7 @@ export class MPView extends ItemView {
         });
 
         this.fontSizeSelect.addEventListener('change', updateFontSize);
-
+        console.log('container',container);
         // 预览区域
         this.previewEl = container.createEl('div', { cls: 'mp-preview-area' });
 
@@ -363,7 +365,7 @@ export class MPView extends ItemView {
         if (!file || file.extension !== 'md') {
             this.previewEl.empty();
             this.previewEl.createEl('div', {
-                text: '只能预览 Markdown 文本文档',
+                text: '只能预览 markdown 文本文档',
                 cls: 'mp-empty-message'
             });
             this.updateControlsState(false);
@@ -409,9 +411,10 @@ export class MPView extends ItemView {
         const isAtBottom = (this.previewEl.scrollHeight - this.previewEl.scrollTop) <= (this.previewEl.clientHeight + 100);
 
         this.previewEl.empty();
-        const content = await this.app.vault.read(this.currentFile);
+        const content = await this.app.vault.cachedRead(this.currentFile);
         
-        await MarkdownRenderer.renderMarkdown(
+        await MarkdownRenderer.render(
+            this.app,
             content,
             this.previewEl,
             this.currentFile.path,

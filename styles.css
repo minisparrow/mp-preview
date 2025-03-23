@@ -1,6 +1,9 @@
 /* 状态栏样式覆盖 */
-.workspace-leaf-content .view-content {
-    padding: 10px 10px 13px 10px;;
+.mp-view-content {
+    height: 100%;
+    padding: 10px 10px 0 10px;
+    overflow: auto;
+
 }
 
 /* 工具栏基础样式 */
