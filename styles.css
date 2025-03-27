@@ -3,7 +3,6 @@
     height: 100%;
     padding: 10px 10px 0 10px;
     overflow: auto;
-
 }
 
 /* 工具栏基础样式 */
@@ -19,14 +18,14 @@
 
 .mp-toolbar {
     top: 0;
-    background: rgba(82, 144, 220, 0.03);
-    border-bottom: 1px solid rgba(82, 144, 220, 0.1);
+    background: var(--background-secondary);
+    border-bottom: 1px solid var(--background-modifier-border);
 }
 
 .mp-bottom-bar {
     bottom: 0;
-    background: rgba(82, 144, 220, 0.02);
-    border-top: 1px solid rgba(82, 144, 220, 0.1);
+    background: var(--background-secondary);
+    border-top: 1px solid var(--background-modifier-border);
 }
 
 /* 控件组布局 */
@@ -44,24 +43,24 @@
 .mp-lock-button {
     width: 32px;
     height: 32px;
-    border: 1px solid #e8e8e8;
+    border: 1px solid var(--background-modifier-border);
     border-radius: 8px;
-    background: white;
-    color: #666;
+    background: var(--background-primary);
+    color: var(--text-muted);
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     transition: all 0.2s ease;
     font-size: 16px;
-    box-shadow: 0 1px 3px rgba(82, 144, 220, 0.1);
+    box-shadow: 0 1px 3px var(--background-modifier-box-shadow);
 }
 
 .mp-lock-button:hover {
-    background: #f5f8fc;
-    border-color: #5C5F77;
-    color: #5C5F77;
-    box-shadow: 0 2px 6px rgba(82, 144, 220, 0.15);
+    background: var(--background-modifier-hover);
+    border-color: var(--text-normal);
+    color: var(--text-normal);
+    box-shadow: 0 2px 6px var(--background-modifier-box-shadow);
 }
 
 /* 下拉选择器 */
@@ -73,35 +72,35 @@
 .custom-select {
     height: 32px;
     padding: 0 12px;
-    border: 1px solid #5C5F77;
+    border: 1px solid var(--background-modifier-border);
     border-radius: 8px;
-    background: white;
+    background: var(--background-primary);
     display: flex;
     align-items: center;
     justify-content: space-between;
     cursor: pointer;
     user-select: none;
     transition: all 0.2s ease;
-    color: #5C5F77;
-    box-shadow: 0 1px 3px rgba(82, 144, 220, 0.1);
+    color: var(--text-normal);
+    box-shadow: 0 1px 3px var(--background-modifier-box-shadow);
 }
 
 .custom-select:hover {
-    background: #f5f8fc;
-    box-shadow: 0 2px 6px rgba(82, 144, 220, 0.15);
+    background: var(--background-modifier-hover);
+    box-shadow: 0 2px 6px var(--background-modifier-box-shadow);
 }
 
 .custom-select.disabled {
     opacity: 0.5;
-    background: #f5f5f5 !important;
-    color: #999 !important;
-    border-color: #e8e8e8 !important;
+    background: var(--background-secondary) !important;
+    color: var(--text-muted) !important;
+    border-color: var(--background-modifier-border) !important;
     cursor: not-allowed;
     box-shadow: none;
 }
 
 .select-arrow {
-    color: #5C5F77;
+    color: var(--text-normal);
     font-size: 12px;
     transition: transform 0.2s ease;
 }
@@ -111,10 +110,10 @@
     top: calc(100% + 4px);
     left: 0;
     width: 100%;
-    background: white;
-    border: 1px solid #e8e8e8;
+    background: var(--background-primary);
+    border: 1px solid var(--background-modifier-border);
     border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(82, 144, 220, 0.15);
+    box-shadow: 0 4px 12px var(--background-modifier-box-shadow);
     display: none;
     z-index: 1000;
     overflow: hidden;
@@ -128,16 +127,16 @@
     padding: 8px 12px;
     cursor: pointer;
     transition: all 0.2s ease;
-    color: #333;
+    color: var(--text-normal);
 }
 
 .select-item:hover {
-    background: #f5f8fc;
+    background: var(--background-modifier-hover);
 }
 
 .select-item.selected {
-    background-color: #f5f8fc;
-    color: #5C5F77;
+    background: var(--background-modifier-hover);
+    color: var(--text-accent);
 }
 
 /* 字号调整组件 */
@@ -148,20 +147,20 @@
     align-items: center;
     justify-content: space-between;
     height: 32px;
-    background: white;
-    border: 1px solid #5C5F77;
+    background: var(--background-primary);
+    border: 1px solid var(--background-modifier-border);
     border-radius: 8px;
     padding: 0;
     overflow: hidden;
-    box-shadow: 0 1px 3px rgba(82, 144, 220, 0.1);
+    box-shadow: 0 1px 3px var(--background-modifier-box-shadow);
 }
 
 .mp-font-size-btn {
     width: 55px;
     height: 32px;
     border: none;
-    background: white;
-    color: #5C5F77;
+    background: var(--background-primary);
+    color: var(--text-normal);
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -171,7 +170,7 @@
 }
 
 .mp-font-size-btn:hover {
-    background: rgba(82, 144, 220, 0.05);
+    background: var(--background-modifier-hover);
 }
 
 .mp-font-size-input {
@@ -182,7 +181,7 @@
     margin: 0;
     border: none;
     background: transparent;
-    color: #5C5F77;
+    color: var(--text-normal);
     outline: none;
 }
 
@@ -192,11 +191,11 @@
     margin: 10px;
     height: calc(100% - 180px);
     overflow-y: auto;
-    background: white;
+    background: #fcfcfc;
     flex: 1;
     border-radius: 12px;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
-    border: 1px solid rgba(82, 144, 220, 0.1);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.02);
+    border: 1px solid rgba(82, 144, 220, 0.08);
 }
 
 .mp-empty-message {
@@ -204,7 +203,7 @@
     justify-content: center;
     align-items: center;
     height: 100%;
-    color: #999;
+    color: var(--text-muted);
     font-size: 16px;
 }
 
@@ -212,39 +211,40 @@
 .mp-help-button {
     width: 32px;
     height: 32px;
-    border: 1px solid #e8e8e8;
+    border: 1px solid var(--background-modifier-border);
     border-radius: 8px;
-    background: white;
-    color: #666;
+    background: var(--background-primary);
+    color: var(--text-muted);
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     transition: all 0.2s ease;
     font-size: 16px;
-    box-shadow: 0 1px 3px rgba(82, 144, 220, 0.1);
+    box-shadow: 0 1px 3px var(--background-modifier-box-shadow);
 }
-.mp-help-button:hover{
-    background: #f5f8fc;
-    border-color: #5C5F77;
-    color: #5C5F77;
-    box-shadow: 0 2px 6px rgba(82, 144, 220, 0.15);
+
+.mp-help-button:hover {
+    background: var(--background-modifier-hover);
+    border-color: var(--text-normal);
+    color: var(--text-normal);
+    box-shadow: 0 2px 6px var(--background-modifier-box-shadow);
 }
 
 /* 提示框位置调整 */
 .mp-help-tooltip {
     position: absolute;
-    left: 32px; /* 改为左对齐 */
+    left: 32px;
     bottom: 48px;
     width: 300px;
     padding: 12px 16px;
-    background: white;
-    border: 2px solid rgba(82, 144, 220, 0.1);
+    background: var(--background-primary);
+    border: 2px solid var(--background-modifier-border);
     border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 4px 12px var(--background-modifier-box-shadow);
     font-size: 13px;
     line-height: 1.6;
-    color: #5290DC;
+    color: var(--text-normal);
     display: none;
     white-space: pre-line;
     z-index: 1000;
@@ -253,15 +253,16 @@
 .mp-help-button:hover + .mp-help-tooltip {
     display: block;
 }
+
 /* 底部按钮 */
 .mp-bottom-controls-group button {
     padding: 8px 24px;
     width: 164px;
     height: 36px;
     border-radius: 8px;
-    border: 1px solid #5C5F77;
-    background: white;
-    color: #5C5F77;
+    border: 1px solid var(--background-modifier-border);
+    background: var(--background-primary);
+    color: var(--text-normal);
     cursor: pointer;
     transition: all 0.2s ease;
     font-size: 14px;
@@ -269,44 +270,45 @@
     align-items: center;
     justify-content: center;
     gap: 6px;
-    box-shadow: 0 1px 3px rgba(82, 144, 220, 0.1);
+    box-shadow: 0 1px 3px var(--background-modifier-box-shadow);
 }
 
 .mp-bottom-controls-group button:hover {
-    background: rgba(82, 144, 220, 0.05);
+    background: var(--background-modifier-hover);
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(82, 144, 220, 0.2);
+    box-shadow: 0 4px 12px var(--background-modifier-box-shadow);
 }
 
 .mp-copy-button:not(:disabled) {
-    background: #5290DC !important;
-    color: white !important;
+    background: var(--interactive-accent) !important;
+    color: var(--text-on-accent) !important;
     border: none !important;
-    box-shadow: 0 2px 6px rgba(82, 144, 220, 0.2) !important;
+    box-shadow: 0 2px 6px var(--background-modifier-box-shadow) !important;
 }
 
 .mp-copy-button:not(:disabled):hover {
-    background: #4a83c8 !important;
-    box-shadow: 0 4px 12px rgba(82, 144, 220, 0.3) !important;
+    background: var(--interactive-accent-hover) !important;
+    box-shadow: 0 4px 12px var(--background-modifier-box-shadow) !important;
 }
 
 .mp-new-button {
     opacity: 0.5;
-    border-color: #5C5F77 !important;
-    background: white !important;
-    color: #5C5F77 !important;
+    border-color: var(--background-modifier-border) !important;
+    background: var(--background-primary) !important;
+    color: var(--text-muted) !important;
     cursor: not-allowed !important;
 }
 
 .mp-bottom-controls-group button:disabled {
     opacity: 0.5;
-    background: white !important;
-    color: #5C5F77 !important;
+    background: var(--background-primary) !important;
+    color: var(--text-muted) !important;
     cursor: not-allowed !important;
     transform: none;
-    border-color: #5C5F77 !important;
+    border-color: var(--background-modifier-border) !important;
     box-shadow: none;
 }
+
 /* 关于作者的框 */
 .mp-donate-overlay {
     position: fixed;
@@ -314,7 +316,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.6);
+    background: var(--background-modifier-cover);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -323,13 +325,13 @@
 
 /* 弹框主体 */
 .mp-about-modal {
-    background: white;
+    background: var(--background-primary);
     border-radius: 12px;
     padding: 20px 20px;
     width: 520px;
     max-height: 90vh;
     position: relative;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 4px 10px var(--background-modifier-box-shadow);
     display: flex;
     flex-direction: column;
     gap: 10px;
@@ -342,17 +344,17 @@
 }
 
 .mp-about-modal::-webkit-scrollbar-track {
-    background: #f5f5f5;
+    background: var(--scrollbar-track-background);
     border-radius: 4px;
 }
 
 .mp-about-modal::-webkit-scrollbar-thumb {
-    background: #ddd;
+    background: var(--scrollbar-thumb-background);
     border-radius: 4px;
 }
 
 .mp-about-modal::-webkit-scrollbar-thumb:hover {
-    background: #ccc;
+    background: var(--scrollbar-thumb-background-hover);
 }
 
 /* 关闭按钮 */
@@ -366,13 +368,14 @@
     border: none;
     border-radius: 6px;
     font-size: 17px;
-    color: #bfbfbf;
+    color: var(--text-muted);
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     transition: all 0.2s ease;
 }
+
 /* macOS 系统下的样式 */
 @media screen and (-webkit-min-device-pixel-ratio: 0) and (min-color-index:0) {
     .mp-donate-close {
@@ -382,8 +385,8 @@
 }
 
 .mp-donate-close:hover {
-    background: #f5f5f5;
-    color: #595959;
+    background: var(--background-modifier-hover);
+    color: var(--text-normal);
 }
 
 /* 内容区块 */
@@ -394,58 +397,58 @@
 }
 
 .mp-about-intro-section {
-    background: #fafafa;
-    border: 1px solid #f0f0f0;
+    background: var(--background-secondary);
+    border: 1px solid var(--background-modifier-border);
 }
 
 .mp-about-donate-section {
-    background: #fff9f5;
-    border: 1px solid #ffe4d9;
+    background: var(--background-secondary);
+    border: 1px solid var(--background-modifier-border);
 }
 
 .mp-about-mp-section {
-    background: #f5fff7;
-    border: 1px solid #e6f7e9;
+    background: var(--background-secondary);
+    border: 1px solid var(--background-modifier-border);
 }
 
 /* 文字样式 */
 .mp-about-title {
     font-size: 20px;
     font-weight: 600;
-    color: #2c3e50;
+    color: var(--text-normal);
     margin: 0 0 1px;
     text-align: center;
     letter-spacing: 0.5px;
 }
 
 .mp-about-name {
-    color: #5290DC;
+    color: var(--text-accent);
     font-weight: 600;
     font-size: 16px;
     padding: 0 2px;
 }
 
 .mp-about-identity {
-    color: #34495e;
+    color: var(--text-normal);
     font-weight: 500;
-    background: rgba(8, 98, 209, 0.08);
+    background: var(--background-modifier-hover);
     padding: 0 4px;
     border-radius: 3px;
 }
 
 .mp-about-highlight {
-    color: #e67e22;
+    color: var(--text-accent);
     font-weight: 500;
 }
 
 .mp-about-value {
-    color: #16a085;
+    color: var(--text-accent);
     font-weight: 500;
 }
 
 .mp-about-subtitle {
     font-size: 18px;
-    color: #d35400;
+    color: var(--text-accent);
     margin: 8px 0 12px;
     letter-spacing: 0.3px;
     font-weight: 600;
@@ -453,7 +456,7 @@
 
 .mp-about-intro {
     font-size: 15px;
-    color: #2c3e50;
+    color: var(--text-normal);
     margin: 8px 0;
     line-height: 1.8;
     letter-spacing: 0.2px;
@@ -462,7 +465,7 @@
 .mp-about-role, 
 .mp-about-desc {
     font-size: 14.5px;
-    color: #34495e;
+    color: var(--text-normal);
     margin: 6px 0;
     line-height: 1.8;
     letter-spacing: 0.2px;
@@ -470,16 +473,16 @@
 
 .mp-about-emphasis {
     font-weight: 500;
-    color: #c0392b;
+    color: var(--text-accent);
 }
 
 .mp-about-footer {
     font-size: 15px;
-    color: #2c3e50;
+    color: var(--text-normal);
     text-align: center;
     margin: 1px 0 0;
     padding: 1px 1px;
-    background: #f8f9fa;
+    background: var(--background-secondary);
     border-radius: 8px;
     font-weight: 500;
     letter-spacing: 0.3px;
@@ -487,21 +490,22 @@
 }
 
 .mp-about-footer strong {
-    color: #8e44ad;
+    color: var(--text-accent);
     font-weight: 600;
 }
+
 /* 二维码容器 */
 .mp-about-qr {
     width: 100%;
     height: 150px;
     margin: 5px 0;
     padding: 5px;
-    background: white;
+    background: var(--background-primary);
     border-radius: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    box-shadow: 0 2px 8px var(--background-modifier-box-shadow);
 }
 
 .mp-about-qr img {
@@ -512,7 +516,7 @@
 
 /* 链接样式 */
 .mp-content-section a {
-    color: #576b95;
+    color: var(--text-accent);
     text-decoration: none;
 }
 
@@ -525,14 +529,14 @@
 
 .mp-content-section th,
 .mp-content-section td {
-    border: 1px solid #dfdfdf;
+    border: 1px solid var(--background-modifier-border);
     padding: 8px;
 }
 
 /* 分割线样式 */
 .mp-content-section hr {
     border: none;
-    border-top: 1px solid #dfdfdf;
+    border-top: 1px solid var(--background-modifier-border);
     margin: 20px 0;
 }
 
@@ -553,7 +557,7 @@
 /* 脚注样式 */
 .mp-content-section .footnote-ref,
 .mp-content-section .footnote-backref {
-    color: #576b95;
+    color: var(--text-accent);
     text-decoration: none;
 }
 
