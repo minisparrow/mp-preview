@@ -51,18 +51,19 @@ export class MPView extends ItemView {
         container.classList.remove('view-content');
         container.classList.add('mp-view-content');
         
+        // 顶部工具栏
         const toolbar = container.createEl('div', { cls: 'mp-toolbar' });
+        const controlsGroup = toolbar.createEl('div', { cls: 'mp-controls-group' });
         
         // 锁定按钮
-        this.lockButton = toolbar.createEl('button', {
+        this.lockButton = controlsGroup.createEl('button', {
             cls: 'mp-lock-button',
             text: '🔓',
             attr: { 'aria-label': '关闭实时预览状态' }
         });
         this.lockButton.addEventListener('click', () => this.togglePreviewLock());
     
-        // 创建中间控件容器
-        const controlsGroup = toolbar.createEl('div', { cls: 'mp-controls-group' });
+
         
         // 添加背景选择器
         const backgroundOptions = [
@@ -243,22 +244,22 @@ export class MPView extends ItemView {
         });
 
         this.fontSizeSelect.addEventListener('change', updateFontSize);
-        console.log('container',container);
         // 预览区域
         this.previewEl = container.createEl('div', { cls: 'mp-preview-area' });
 
         // 底部工具栏
         const bottomBar = container.createEl('div', { cls: 'mp-bottom-bar' });
-
-        // 添加使用说明按钮
-        const helpButton = bottomBar.createEl('button', {
+        // 创建中间控件容器
+        const bottomControlsGroup = bottomBar.createEl('div', { cls: 'mp-controls-group' });
+        // 帮助按钮
+        const helpButton = bottomControlsGroup.createEl('button', {
             cls: 'mp-help-button',
             text: '❓',
             attr: { 'aria-label': '使用指南' }
         });
         
-        // 创建提示框
-        const tooltip = bottomBar.createEl('div', {
+        // 帮助提示框
+        bottomControlsGroup.createEl('div', {
             cls: 'mp-help-tooltip',
             text: `使用指南：
                 1. 选择喜欢的主题模板
@@ -269,10 +270,9 @@ export class MPView extends ItemView {
                 6. 如果你喜欢这个插件，欢迎关注打赏`
         });
 
-        // 创建中间控件容器
-        const bottomControlsGroup = bottomBar.createEl('div', { cls: 'mp-bottom-controls-group' });
         
-        // 请作者喝咖啡按钮
+        
+        // 关于作者按钮
         const likeButton = bottomControlsGroup.createEl('button', { 
             cls: 'mp-like-button'
         });
@@ -286,12 +286,12 @@ export class MPView extends ItemView {
             DonateManager.showDonateModal(this.containerEl);
         });
 
-        // 在控件容器中创建按钮
+        // 复制按钮
         this.copyButton = bottomControlsGroup.createEl('button', { 
-            text: '复制为公众号格式',
+            text: '复制到公众号',
             cls: 'mp-copy-button'
         });
-
+        //新功能按钮
         const newButton = bottomControlsGroup.createEl('button', { 
             text: '敬请期待',
             cls: 'mp-new-button'
