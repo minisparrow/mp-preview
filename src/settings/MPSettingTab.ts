@@ -50,7 +50,7 @@ export class MPSettingTab extends PluginSettingTab {
         containerEl.empty();
         containerEl.addClass('mp-settings');
 
-        containerEl.createEl('h2', { text: 'MP 设置' });
+        containerEl.createEl('h2', { text: 'MP Preview 设置' });
 
         this.createSection(containerEl, '基本设置', el => this.renderBasicSettings(el));
         this.createSection(containerEl, '模板设置', el => this.renderTemplateSettings(el));
