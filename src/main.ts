@@ -1,11 +1,12 @@
 import { Plugin, Notice } from 'obsidian';
 import { MPView, VIEW_TYPE_MP } from './view';
 import { TemplateManager } from './templateManager';
-import { SettingsManager } from './settings';
+import { SettingsManager } from './settings/settings';
 import { MPConverter } from './converter';
 import { DonateManager } from './donateManager';
+import { MPSettingTab } from './settings/MPSettingTab';
 export default class MPPlugin extends Plugin {
-    private settingsManager: SettingsManager;
+    settingsManager: SettingsManager;
 
     async onload() {
         // 初始化设置管理器
@@ -13,11 +14,11 @@ export default class MPPlugin extends Plugin {
         await this.settingsManager.loadSettings();
 
         // 初始化模板管理器
-        const templateManager = new TemplateManager(this.app);
-        
+        const templateManager = new TemplateManager(this.app, this.settingsManager);
+
         // 初始化转换器
         MPConverter.initialize(this.app);
-        
+
         DonateManager.initialize(this.app, this);
 
         // 注册视图
@@ -48,8 +49,11 @@ export default class MPPlugin extends Plugin {
                 await this.activateView();
             }
         });
+
+        // 在插件的 onload 方法中添加：
+        this.addSettingTab(new MPSettingTab(this.app, this));
     }
-  
+
     async activateView() {
         // 如果视图已经存在，激活它
         const leaves = this.app.workspace.getLeavesOfType(VIEW_TYPE_MP);

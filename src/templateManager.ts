@@ -1,9 +1,12 @@
 import { App } from 'obsidian';
-import { templates } from './templates';
+import { SettingsManager } from './settings/settings';
 
-interface Template {
+export interface Template {
     id: string;
     name: string;
+    description: string;
+    isPreset?: boolean;
+    isVisible?: boolean;
     styles: {
         container: string;
         title: {
@@ -65,46 +68,21 @@ export class TemplateManager {
     private currentFont: string = '-apple-system';
     private currentFontSize: number = 16;
     private app: App;
+    private settingsManager: SettingsManager;
 
-    constructor(app: App) {
+    constructor(app: App, settingsManager: SettingsManager) {
         this.app = app;
-        this.loadTemplates(); // 加载模板
-    }
-
-    public async loadTemplates() {
-        try {
-            // 直接从内置模板加载
-            Object.values(templates).forEach(template => {
-                this.templates.set(template.id, template);
-                if (template.id === 'default') {
-                    this.currentTemplate = template;
-                }
-            });
-        } catch (error) {
-            console.error('加载模板失败:', error);
-            throw new Error('无法加载模板文件');
-        }
-    }
-
-    public getTemplate(id: string): Template | undefined {
-        return this.templates.get(id);
-    }
-
-    public getCurrentTemplate(): Template {
-        return this.currentTemplate;
+        this.settingsManager = settingsManager;
     }
 
     public setCurrentTemplate(id: string): boolean {
-        const template = this.templates.get(id);
+        const template = this.settingsManager.getTemplate(id);
         if (template) {
             this.currentTemplate = template;
             return true;
         }
+        console.error('主题未找到:', id);
         return false;
-    }
-
-    public getAllTemplates(): Template[] {
-        return Array.from(this.templates.values());
     }
 
     public setFont(fontFamily: string) {
@@ -117,16 +95,6 @@ export class TemplateManager {
 
     public applyTemplate(element: HTMLElement): void {
         const styles = this.currentTemplate.styles;
-        // 应用基础样式到根元素
-        element.style.cssText = `
-            word-break: break-all;
-            line-height: 1.7;
-            overflow-wrap: break-word;
-            white-space: normal;
-            border: none;
-            ${styles.container}
-        `;
-
         // 应用标题样式
         ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'].forEach(tag => {
             element.querySelectorAll(tag).forEach(el => {
@@ -262,4 +230,4 @@ export class TemplateManager {
     }
 }
 
-export const templateManager = (app: App) => new TemplateManager(app);
+export const templateManager = (app: App, settingsManager: SettingsManager) => new TemplateManager(app, settingsManager);

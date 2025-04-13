@@ -1,0 +1,1055 @@
+import { App, Modal, Setting, Notice, setIcon } from 'obsidian';
+import { Template } from '../templateManager';
+
+export class CreateTemplateModal extends Modal {
+    private template: Template;
+    private onSubmit: (template: Template) => void;
+    private nameInput: HTMLInputElement;
+
+    constructor(app: App, onSubmit: (template: Template) => void, existingTemplate?: Template) {
+        super(app);
+        this.onSubmit = onSubmit;
+        this.template = existingTemplate ? { ...existingTemplate } : {
+            id: this.generateTemplateId('未命名模板'),
+            name: '',
+            description: '',
+            isPreset: false,
+            isVisible: true,
+            styles: this.initializeStyles()
+        };
+    }
+
+    private initializeStyles(): any {
+        return {
+            container: "",
+            title: {
+                h1: {
+                    base: "margin: 32px 0 0; font-size: 2em; letter-spacing: -0.03em; line-height: 1.5;",
+                    content: "font-weight: bold; color: #d64b3b;",
+                    after: ""
+                },
+                h2: {
+                    base: "margin: 28px 0 0; font-size: 1.5em; letter-spacing: -0.02em; border-bottom: 2px solid #ef7060; line-height: 1.2;",
+                    content: "display: inline-block; font-weight: bold; background: #ef7060; color: #ffffff; padding: 1px 4px; border-top-right-radius: 3px; border-top-left-radius: 3px; margin-right: 3px;",
+                    after: "display: inline-block; content: ' '; vertical-align: bottom; border-bottom: 28px solid #fff5f4; border-right: 20px solid transparent;"
+                },
+                h3: {
+                    base: "margin: 24px 0 0; font-size: 1.25em; letter-spacing: -0.01em; line-height: 1.5;",
+                    content: "font-weight: bold; color: #f18070;",
+                    after: ""
+                },
+                base: {
+                    base: "margin: 20px 0 14px; font-size: 1em; line-height: 1.5;",
+                    content: "font-weight: bold; color: #f39080;",
+                    after: ""
+                }
+            },
+            paragraph: "line-height: 1.8; margin-bottom: 1.2em; font-size: 1em; color: #4a4a4a;",
+            list: {
+                container: "padding-left: 32px; margin-bottom: 1.2em; color: #4a4a4a;",
+                item: "margin-bottom: 0.6em; font-size: 1em; color: #4a4a4a; line-height: 1.8;",
+                taskList: "list-style: none; margin-left: -24px; font-size: 1em; color: #4a4a4a; line-height: 1.8;"
+            },
+            code: {
+                block: "background: #fff8f7; padding: 0.5em 1em 1em; border-radius: 8px; font-size: 14px; font-family: Operator Mono, Consolas, Monaco, Menlo, monospace; line-height: 1.6; white-space: pre; overflow-x: auto; word-wrap: normal; color: #333; margin: 1.2em 0; border: 1px solid #ffe8e6; box-shadow: 0 2px 4px rgba(239,112,96,0.05); width: 100%;",
+                inline: "background: #fff8f7; padding: 2px 6px; border-radius: 4px; color: #333; font-size: 14px; font-family: Operator Mono, Consolas, Monaco, Menlo, monospace; border: 1px solid #ffe8e6;"
+            },
+            quote: "border-left: 4px solid #ef7060; border-radius: 6px; padding: 16px 20px; background: #fff5f4; margin: 0.8em 0; color: #d64b3b; font-style: italic; font-size: 1em; word-wrap: break-word;",
+            image: "max-width: 100%; height: auto; margin: 1em auto; display: block;",
+            link: "color: #ef7060; text-decoration: none; border-bottom: 1px solid #ef7060; transition: all 0.2s ease;",
+            emphasis: {
+                strong: "font-weight: bold; color: #4a4a4a;",
+                em: "font-style: italic; color: #4a4a4a;",
+                del: "text-decoration: line-through; color: #4a4a4a;"
+            },
+            table: {
+                container: "width: 100%; margin: 1em 0; border-collapse: collapse; border: 1px solid #ffe8e6;",
+                header: "background: #fff8f7; font-weight: bold; color: #4a4a4a; border-bottom: 2px solid #ffe8e6; font-size: 1em;",
+                cell: "border: 1px solid #f0f0f0; padding: 8px; color: #4a4a4a; font-size: 1em;"
+            },
+            hr: "border: none; border-top: 1px solid #ffe8e6; margin: 20px 0;",
+            footnote: {
+                ref: "color: #e0e0e0; text-decoration: none; font-size: 0.9em;",
+                backref: "color: #e0e0e0; text-decoration: none; font-size: 0.9em;"
+            }
+        };
+    }
+
+    onOpen() {
+        const { contentEl } = this;
+        contentEl.empty();
+        contentEl.addClass('mp-template-modal');
+
+        // 创建固定的头部区域
+        const headerEl = contentEl.createDiv('modal-header');
+        headerEl.createEl('h2', { text: this.template.id ? '编辑模板' : '新建模板' });
+
+        // 创建模板名称输入区域（在头部）
+        const nameContainer = headerEl.createDiv('name-container');
+        new Setting(nameContainer)
+            .setName('模板名称')
+            .addText(text => {
+                this.nameInput = text
+                    .setPlaceholder('请输入模板名称')
+                    .setValue(this.template.name)
+                    .onChange(value => {
+                        const trimmedValue = value.trim();
+                        this.template.name = trimmedValue;
+
+                        if (!trimmedValue) {
+                            new Notice('模板名称不能为空');
+                        }
+
+                        if (!this.template.id.startsWith('preset-')) {
+                            this.template.id = this.generateTemplateId(trimmedValue || '未命名模板');
+                        }
+                    })
+                    .inputEl;
+
+                setTimeout(() => this.nameInput.focus(), 0);
+                return text;
+            });
+        new Setting(nameContainer)
+            .setName('模板描述')
+            .addText(text => {
+                text.setPlaceholder('请输入模板描述')
+                    .setValue(this.template.description)
+                    .onChange(value => {
+                        const trimmedValue = value.trim();
+                        this.template.description = trimmedValue;
+                    });
+                return text;
+            });
+
+        // 创建可滚动的内容区域
+        const scrollContainer = contentEl.createDiv('modal-scroll-container');
+        const settingContainer = scrollContainer.createDiv('setting-container');
+
+        // 添加样式设置
+        this.addStyleSettings(settingContainer, '全局样式', this.template.styles);
+        this.addStyleSettings(settingContainer, '标题样式', this.template.styles.title);
+        this.addStyleSettings(settingContainer, '段落样式', this.template.styles);
+        this.addStyleSettings(settingContainer, '列表样式', this.template.styles.list);
+        this.addStyleSettings(settingContainer, '代码样式', this.template.styles.code);
+        this.addStyleSettings(settingContainer, '引用样式', this.template.styles);
+        this.addStyleSettings(settingContainer, '图片样式', this.template.styles);
+        this.addStyleSettings(settingContainer, '链接样式', this.template.styles);
+        this.addStyleSettings(settingContainer, '表格样式', this.template.styles.table);
+        this.addStyleSettings(settingContainer, '分隔线样式', this.template.styles);
+        this.addStyleSettings(settingContainer, '脚注样式', this.template.styles.footnote);
+
+        // 保存和取消按钮
+        const buttonContainer = contentEl.createDiv('modal-button-container');
+        new Setting(buttonContainer)
+            .addButton(btn => btn
+                .setButtonText('保存')
+                .setCta()
+                .onClick(async () => {
+                    if (await this.validateAndSubmit()) {
+                        this.close();
+                    }
+                }))
+            .addButton(btn => btn
+                .setButtonText('取消')
+                .onClick(() => this.close()));
+
+        this.nameInput.addEventListener('keydown', async (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                if (await this.validateAndSubmit()) {
+                    this.close();
+                }
+            }
+        });
+    }
+
+    private addStyleSettings(container: HTMLElement, sectionName: string, styles: any) {
+        const section = container.createDiv('style-section');
+
+        // 创建折叠面板标题区域
+        const header = section.createDiv('style-section-header');
+        const titleContainer = header.createDiv('style-section-title');
+        const toggle = titleContainer.createSpan('style-section-toggle');
+        setIcon(toggle, 'chevron-right');
+        titleContainer.createEl('h3', { text: sectionName });
+
+        // 添加恢复默认按钮
+        const resetButton = header.createDiv('style-section-reset');
+        const resetIcon = resetButton.createSpan('clickable-icon');
+        setIcon(resetIcon, 'reset');
+        resetButton.addEventListener('click', (e) => {
+            e.stopPropagation();  // 防止触发折叠面板
+            const defaultStyles = this.initializeStyles();
+
+            // 更新 this.template.styles
+            switch (sectionName) {
+                case '全局样式':
+                    this.template.styles = defaultStyles;
+                    styles = defaultStyles;
+                    break;
+                case '标题样式':
+                    this.template.styles.title = defaultStyles.title;
+                    styles = defaultStyles.title;
+                    break;
+                case '段落样式':
+                    this.template.styles.paragraph = defaultStyles.paragraph;
+                    styles = { paragraph: defaultStyles.paragraph };
+                    break;
+                case '列表样式':
+                    this.template.styles.list = defaultStyles.list;
+                    styles = defaultStyles.list;
+                    break;
+                case '代码样式':
+                    this.template.styles.code = defaultStyles.code;
+                    styles = defaultStyles.code;
+                    break;
+                case '引用样式':
+                    this.template.styles.quote = defaultStyles.quote;
+                    styles = { quote: defaultStyles.quote };
+                    break;
+                case '链接样式':
+                    this.template.styles.link = defaultStyles.link;
+                    styles = { link: defaultStyles.link };
+                    break;
+                case '表格样式':
+                    this.template.styles.table = defaultStyles.table;
+                    styles = defaultStyles.table;
+                    break;
+                case '分隔线样式':
+                    this.template.styles.hr = defaultStyles.hr;
+                    styles = { hr: defaultStyles.hr };
+                    break;
+                case '脚注样式':
+                    this.template.styles.footnote = defaultStyles.footnote;
+                    styles = defaultStyles.footnote;
+                    break;
+                case '图片样式':
+                    this.template.styles.image = defaultStyles.image;
+                    styles = { image: defaultStyles.image };
+                    break;
+            }
+
+            // 重新渲染设置项
+            content.empty();
+            this.addStyleSettingsContent(content, sectionName, styles);
+        });
+
+        // 创建内容区域
+        const content = section.createDiv('style-section-content');
+        this.addStyleSettingsContent(content, sectionName, styles);
+
+        // 折叠面板点击事件
+        header.addEventListener('click', () => {
+            const isExpanded = !section.hasClass('is-expanded');
+            section.toggleClass('is-expanded', isExpanded);
+            setIcon(toggle, isExpanded ? 'chevron-down' : 'chevron-right');
+        });
+    }
+
+    // 新增方法，用于处理设置内容
+    private addStyleSettingsContent(content: HTMLElement, sectionName: string, styles: any) {
+        switch (sectionName) {
+            case '全局样式':
+                this.addGlobalStylesSettings(content, styles);
+                break;
+            case '标题样式':
+                this.addTitleSettings(content, styles);
+                break;
+            case '段落样式':
+                this.addParagraphAndEmphasisSettings(content, styles);
+                break;
+            case '列表样式':
+                this.addListSettings(content, styles);
+                break;
+            case '代码样式':
+                this.addCodeSettings(content, styles);
+                break;
+            case '引用样式':
+                this.addQuoteSettings(content, styles);
+                break;
+            case '链接样式':
+                this.addLinkSettings(content, styles);
+                break;
+            case '表格样式':
+                this.addTableSettings(content, styles);
+                break;
+            case '分隔线样式':
+                this.addHrSettings(content, styles);
+                break;
+            case '脚注样式':
+                this.addFootnoteSettings(content, styles);
+                break;
+            case '图片样式':
+                this.addImageSettings(content, styles);
+                break;
+        }
+    }
+
+    // 示例方法，用于处理具体的样式设置
+    private addGlobalStylesSettings(container: HTMLElement, styles: any) {
+        const section = container.createDiv('global-style-section');
+
+        new Setting(section)
+            .setName('全局主题色')
+            .setDesc('修改此颜色将更新所有文字相关的颜色')
+            .addColorPicker(color => {
+                const defaultColor = styles.title.h2.content.match(/color:\s*(#[a-fA-F0-9]+)/)?.[1] || '#ef7060';
+                color.setValue(defaultColor)
+                    .onChange(value => {
+                        // 更新段落颜色
+                        styles.paragraph = styles.paragraph.replace(/color:\s*#[a-fA-F0-9]+/, `color: ${value}`);
+
+                        // 更新强调文字颜色
+                        Object.keys(styles.emphasis).forEach(key => {
+                            styles.emphasis[key] = styles.emphasis[key].replace(/color:\s*#[a-fA-F0-9]+/, `color: ${value}`);
+                        });
+
+                        // 更新标题颜色
+                        ['h1', 'h2', 'h3', 'base'].forEach(level => {
+                            styles.title[level].content = styles.title[level].content.replace(/color:\s*#[a-fA-F0-9]+/, `color: ${value}`);
+                        });
+
+                        // 更新列表颜色
+                        ['container', 'item', 'taskList'].forEach(key => {
+                            styles.list[key] = styles.list[key].replace(/color:\s*#[a-fA-F0-9]+/, `color: ${value}`);
+                        });
+
+                        // 更新引用颜色
+                        styles.quote = styles.quote.replace(/color:\s*#[a-fA-F0-9]+/, `color: ${value}`);
+
+                        // 更新代码颜色
+                        ['block', 'inline'].forEach(key => {
+                            styles.code[key] = styles.code[key].replace(/color:\s*#[a-fA-F0-9]+/, `color: ${value}`);
+                        });
+
+                        // 更新链接颜色
+                        styles.link = styles.link.replace(/color:\s*#[a-fA-F0-9]+/, `color: ${value}`)
+                            .replace(/linear-gradient\([^)]+\)/, `linear-gradient(to right, ${value}80, ${value}80)`);
+
+                        // 更新表格颜色
+                        styles.table.header = styles.table.header.replace(/color:\s*#[a-fA-F0-9]+/, `color: ${value}`);
+                        styles.table.cell = styles.table.cell.replace(/color:\s*#[a-fA-F0-9]+/, `color: ${value}`);
+
+                        // 更新脚注颜色
+                        ['ref', 'backref'].forEach(key => {
+                            styles.footnote[key] = styles.footnote[key].replace(/color:\s*#[a-fA-F0-9]+/, `color: ${value}`);
+                        });
+
+                        // 更新图片边框颜色
+                        styles.image = styles.image.replace(/border:\s*1px solid\s*#[a-fA-F0-9]+80/, `border: 1px solid ${value}80`);
+                    });
+            });
+    }
+
+    private addTitleSettings(container: HTMLElement, styles: any) {
+        ['h1', 'h2', 'h3', 'base'].forEach(level => {
+            const titleSection = container.createDiv('style-section');
+
+            // 创建折叠面板标题区域
+            const header = titleSection.createDiv('style-section-header');
+            const titleContainer = header.createDiv('style-section-title');
+            const toggle = titleContainer.createSpan('style-section-toggle');
+            setIcon(toggle, 'chevron-right');
+            titleContainer.createEl('h4', { text: level === 'base' ? '其他标题样式' : `${level.toUpperCase()} 标题样式` });
+
+            // 创建内容区域
+            const content = titleSection.createDiv('style-section-content');
+            content.hide(); // 默认隐藏
+
+            // 折叠面板点击事件
+            header.addEventListener('click', () => {
+                const isExpanded = !titleSection.hasClass('is-expanded');
+                titleSection.toggleClass('is-expanded', isExpanded);
+                setIcon(toggle, isExpanded ? 'chevron-down' : 'chevron-right');
+                content.toggle(isExpanded);
+            });
+
+            new Setting(content)
+                .setName('上边距')
+                .setDesc('设置标题与上方内容之间的间距（单位：像素）')
+                .addText(text => {
+                    const currentMargin = styles[level].base.match(/margin:\s*(\d+)px/)?.[1];
+                    text.setValue(currentMargin)
+                        .onChange(value => {
+                            const margin = parseInt(value) || 10;
+                            if (styles[level].base.includes('margin:')) {
+                                styles[level].base = styles[level].base.replace(/margin:\s*\d+px/, `margin: ${margin}px`);
+                            } else {
+                                styles[level].base += ` margin: ${margin}px;`;
+                            }
+                        });
+                });
+
+            new Setting(content)
+                .setName('字体颜色')
+                .setDesc('设置标题的字体颜色')
+                .addColorPicker(color => {
+                    const currentColor = styles[level].content.match(/color:\s*(#[a-fA-F0-9]+)/)?.[1];
+                    color.setValue(currentColor)
+                        .onChange(value => {
+                            if (styles[level].content.includes('color:')) {
+                                styles[level].content = styles[level].content.replace(/color:\s*#[a-fA-F0-9]+/, `color: ${value}`);
+                            } else {
+                                styles[level].content += ` color: ${value};`;
+                            }
+                        });
+                });
+
+            new Setting(content)
+                .setName('背景颜色')
+                .setDesc('设置标题的背景颜色')
+                .addColorPicker(color => {
+                    const currentBg = styles[level].content.match(/background:\s*(#[a-fA-F0-9]+)/)?.[1];
+                    color.setValue(currentBg)
+                        .onChange(value => {
+                            if (styles[level].content.includes('background:')) {
+                                styles[level].content = styles[level].content.replace(/background:\s*#[a-fA-F0-9]+/, `background: ${value}`);
+                            } else {
+                                styles[level].content += ` background: ${value};`;
+                            }
+                            // 添加圆角
+                            if (!styles[level].content.includes('border-radius:')) {
+                                styles[level].content += ' padding: 1px 4px; border-radius: 3px;';
+                            }
+                        });
+                });
+
+            new Setting(content)
+                .setName('居中')
+                .setDesc('设置标题是否居中')
+                .addToggle(toggle => {
+                    const isCentered = styles[level].base.includes('text-align: center;');
+                    toggle.setValue(isCentered)
+                        .onChange(value => {
+                            styles[level].base = value ? styles[level].base + ' text-align: center;' : styles[level].base.replace(/text-align: center;/, '');
+                        });
+                });
+            new Setting(content)
+                .setName('左边框')
+                .setDesc('设置标题左侧边框是否显示')
+                .addToggle(toggle => {
+                    const hasBorder = styles[level].base.includes('border-left');
+                    toggle.setValue(hasBorder)
+                        .onChange(value => {
+                            const fontColor = styles[level].content.match(/color:\s*(#[a-fA-F0-9]+)/)?.[1];
+                            const bgColor = styles[level].content.match(/background:\s*(#[a-fA-F0-9]+)/)?.[1];
+                            let borderColor = fontColor !== '#ffffff' ? fontColor : bgColor !== '#ffffff' ? bgColor : '#000000';
+                            if (value) {
+                                styles[level].base += ` border-left: 4px solid ${borderColor}; padding-left: 12px;`;
+                            } else {
+                                styles[level].base = styles[level].base.replace(/border-left:[^;]+;/, '').replace(/padding-left:[^;]+;/, '');
+                            }
+                        });
+                });
+
+            new Setting(content)
+                .setName('下划线')
+                .setDesc('设置标题下划线是否显示')
+                .addToggle(toggle => {
+                    const hasUnderline = styles[level].base.includes('border-bottom');
+                    toggle.setValue(hasUnderline)
+                        .onChange(value => {
+                            const fontColor = styles[level].content.match(/color:\s*(#[a-fA-F0-9]+)/)?.[1];
+                            const bgColor = styles[level].content.match(/background:\s*(#[a-fA-F0-9]+)/)?.[1];
+                            let underlineColor = fontColor !== '#ffffff' ? fontColor : bgColor !== '#ffffff' ? bgColor : '#000000';
+                            if (value) {
+                                styles[level].base += ` border-bottom: 1px solid ${underlineColor};`;
+                            } else {
+                                styles[level].base = styles[level].base.replace(/border-bottom:[^;]+;/, '');
+                            }
+                        });
+                });
+            new Setting(content)
+                .setName('阴影效果')
+                .setDesc('选择标题的阴影效果')
+                .addDropdown(dropdown => {
+                    dropdown.addOption('none', '无阴影')
+                        .addOption('small', '小阴影')
+                        .addOption('large', '大阴影')
+                        .setValue(styles[level].after.includes('box-shadow') ? 'large' : 'none')
+                        .onChange(value => {
+                            switch (value) {
+                                case 'none':
+                                    styles[level].after = styles[level].after.replace(/box-shadow:[^;]+;/, '');
+                                    break;
+                                case 'small':
+                                    styles[level].after += ' box-shadow: 0 1px 3px rgba(0,0,0,0.1);';
+                                    break;
+                                case 'large':
+                                    styles[level].after += ' box-shadow: 0 4px 6px rgba(0,0,0,0.1);';
+                                    break;
+                            }
+                        });
+                });
+        });
+    }
+
+    private addParagraphAndEmphasisSettings(container: HTMLElement, styles: any) {
+        const paragraphSection = container.createDiv('style-section');
+
+        // 创建折叠面板标题区域
+        const header = paragraphSection.createDiv('style-section-header');
+        const titleContainer = header.createDiv('style-section-title');
+        const toggle = titleContainer.createSpan('style-section-toggle');
+        setIcon(toggle, 'chevron-right');
+        titleContainer.createEl('h4', { text: '段落样式' });
+
+        // 创建内容区域
+        const content = paragraphSection.createDiv('style-section-content');
+        content.hide(); // 默认隐藏
+
+        // 折叠面板点击事件
+        header.addEventListener('click', () => {
+            const isExpanded = !paragraphSection.hasClass('is-expanded');
+            paragraphSection.toggleClass('is-expanded', isExpanded);
+            setIcon(toggle, isExpanded ? 'chevron-down' : 'chevron-right');
+            content.toggle(isExpanded);
+        });
+
+        new Setting(content)
+            .setName('行高')
+            .setDesc('设置段落文本的行高（推荐值：1.5-2.0）')
+            .addText(text => {
+                const currentLineHeight = styles.paragraph.match(/line-height:\s*([\d.]+)/)?.[1];
+                text.setValue(currentLineHeight)
+                    .onChange(value => {
+                        const lineHeight = parseFloat(value) || 1.75;
+                        styles.paragraph = styles.paragraph.replace(/line-height:\s*[\d.]+/, `line-height: ${lineHeight}`);
+                    });
+            });
+
+        new Setting(content)
+            .setName('下边距')
+            .setDesc('设置段落与下方内容之间的间距（单位：em）')
+            .addText(text => {
+                const currentMargin = styles.paragraph.match(/margin-bottom:\s*([\d.]+)em/)?.[1];
+                text.setValue(currentMargin)
+                    .onChange(value => {
+                        const margin = parseFloat(value) || 1.1;
+                        styles.paragraph = styles.paragraph.replace(/margin-bottom:\s*[\d.]+em/, `margin-bottom: ${margin}em`);
+                    });
+            });
+
+        new Setting(content)
+            .setName('字体大小')
+            .setDesc('设置段落文本的字体大小（单位：像素）')
+            .addText(text => {
+                const currentSize = styles.paragraph.match(/font-size:\s*(\d+)px/)?.[1];
+                text.setValue(currentSize)
+                    .onChange(value => {
+                        const size = parseInt(value) || 15;
+                        styles.paragraph = styles.paragraph.replace(/font-size:\s*\d+px/, `font-size: ${size}px`);
+                    });
+            });
+
+        new Setting(content)
+            .setName('文本颜色')
+            .setDesc('设置段落文本的颜色')
+            .addColorPicker(color => {
+                const currentColor = styles.paragraph.match(/color:\s*(#[a-fA-F0-9]+)/)?.[1];
+                color.setValue(currentColor)
+                    .onChange(value => {
+                        styles.paragraph = styles.paragraph.replace(/color:\s*#[a-fA-F0-9]+/, `color: ${value}`);
+                    });
+            });
+
+        // 强调样式设置
+        const emphasisSection = container.createDiv('style-section');
+
+        // 创建折叠面板标题区域
+        const emphasisHeader = emphasisSection.createDiv('style-section-header');
+        const emphasisTitleContainer = emphasisHeader.createDiv('style-section-title');
+        const emphasisToggle = emphasisTitleContainer.createSpan('style-section-toggle');
+        setIcon(emphasisToggle, 'chevron-right');
+        emphasisTitleContainer.createEl('h4', { text: '强调样式' });
+
+        // 创建内容区域
+        const emphasisContent = emphasisSection.createDiv('style-section-content');
+        emphasisContent.hide(); // 默认隐藏
+
+        // 折叠面板点击事件
+        emphasisHeader.addEventListener('click', () => {
+            const isExpanded = !emphasisSection.hasClass('is-expanded');
+            emphasisSection.toggleClass('is-expanded', isExpanded);
+            setIcon(emphasisToggle, isExpanded ? 'chevron-down' : 'chevron-right');
+            emphasisContent.toggle(isExpanded);
+        });
+
+        new Setting(emphasisContent)
+            .setName('粗体样式')
+            .setDesc('设置粗体文本的样式')
+            .addColorPicker(color => {
+                const currentColor = styles.emphasis.strong.match(/color:\s*(#[a-fA-F0-9]+)/)?.[1];
+                color.setValue(currentColor)
+                    .onChange(value => {
+                        styles.emphasis.strong = styles.emphasis.strong.replace(/color:\s*#[a-fA-F0-9]+/, `color: ${value}`);
+                    });
+            });
+
+        // 斜体设置
+        new Setting(emphasisContent)
+            .setName('斜体样式')
+            .setDesc('设置斜体文本的样式')
+            .addColorPicker(color => {
+                const currentColor = styles.emphasis.em.match(/color:\s*(#[a-fA-F0-9]+)/)?.[1];
+                color.setValue(currentColor)
+                    .onChange(value => {
+                        styles.emphasis.em = styles.emphasis.em.replace(/color:\s*#[a-fA-F0-9]+/, `color: ${value}`);
+                    });
+            });
+
+        // 删除线设置
+        new Setting(emphasisContent)
+            .setName('删除线样式')
+            .setDesc('设置删除线文本的样式')
+            .addColorPicker(color => {
+                const currentColor = styles.emphasis.del.match(/color:\s*(#[a-fA-F0-9]+)/)?.[1];
+                color.setValue(currentColor)
+                    .onChange(value => {
+                        styles.emphasis.del = styles.emphasis.del.replace(/color:\s*#[a-fA-F0-9]+/, `color: ${value}`);
+                    });
+            });
+    }
+
+    private addListSettings(container: HTMLElement, styles: any) {
+        const listSection = container.createDiv('list-section');
+
+        new Setting(listSection)
+            .setName('列表缩进')
+            .setDesc('设置列表的左侧缩进（单位：像素）')
+            .addText(text => {
+                const currentPadding = styles.container.match(/padding-left:\s*(\d+)px/)?.[1];
+                text.setValue(currentPadding)
+                    .onChange(value => {
+                        const padding = parseInt(value) || 26;
+                        styles.container = styles.container.replace(/padding-left:\s*\d+px/, `padding-left: ${padding}px`);
+                    });
+            });
+
+        new Setting(listSection)
+            .setName('列表项间距')
+            .setDesc('设置列表项之间的间距（单位：em）')
+            .addText(text => {
+                const currentMargin = styles.item.match(/margin-bottom:\s*([\d.]+)em/)?.[1];
+                text.setValue(currentMargin)
+                    .onChange(value => {
+                        const margin = parseFloat(value) || 0.8;
+                        styles.item = styles.item.replace(/margin-bottom:\s*[\d.]+em/, `margin-bottom: ${margin}em`);
+                    });
+            });
+
+        new Setting(listSection)
+            .setName('列表文本颜色')
+            .setDesc('设置列表文本的颜色')
+            .addColorPicker(color => {
+                const currentColor = styles.item.match(/color:\s*(#[a-fA-F0-9]+)/)?.[1];
+                color.setValue(currentColor)
+                    .onChange(value => {
+                        ['container', 'item', 'taskList'].forEach(key => {
+                            styles[key] = styles[key].replace(/color:\s*#[a-fA-F0-9]+/, `color: ${value}`);
+                        });
+                    });
+            });
+    }
+
+    private addQuoteSettings(container: HTMLElement, styles: any) {
+        const quoteSection = container.createDiv('quote-section');
+
+        new Setting(quoteSection)
+            .setName('引用边框颜色')
+            .setDesc('设置引用块左侧边框的颜色')
+            .addColorPicker(color => {
+                const currentColor = styles.quote.match(/border-left:\s*\d+px\s*solid\s*(#[a-fA-F0-9]+)/)?.[1];
+                color.setValue(currentColor)
+                    .onChange(value => {
+                        styles.quote = styles.quote.replace(/border-left:\s*\d+px\s*solid\s*#[a-fA-F0-9]+/, `border-left: 3px solid ${value}`);
+
+                        // 如果有渐变背景，也更新背景色
+                        if (styles.quote.includes('linear-gradient')) {
+                            styles.quote = styles.quote.replace(/rgba\([^)]+\)/, `rgba(${parseInt(value.slice(1, 3), 16)},${parseInt(value.slice(3, 5), 16)},${parseInt(value.slice(5, 7), 16)},0.1)`);
+                        }
+                    });
+            });
+
+        new Setting(quoteSection)
+            .setName('引用文本颜色')
+            .setDesc('设置引用块内文本的颜色')
+            .addColorPicker(color => {
+                const currentColor = styles.quote.match(/color:\s*(#[a-fA-F0-9]+)/)?.[1];
+                color.setValue(currentColor)
+                    .onChange(value => {
+                        styles.quote = styles.quote.replace(/color:\s*#[a-fA-F0-9]+/, `color: ${value}`);
+                    });
+            });
+
+        new Setting(quoteSection)
+            .setName('左侧内边距')
+            .setDesc('设置引用块内容与左侧边框之间的距离（单位：像素）')
+            .addText(text => {
+                const currentPadding = styles.quote.match(/padding:\s*0\s*0\s*0\s*(\d+)px/)?.[1];
+                text.setValue(currentPadding)
+                    .onChange(value => {
+                        const padding = parseInt(value) || 20;
+                        styles.quote = styles.quote.replace(/padding:\s*0\s*0\s*0\s*\d+px/, `padding: 0 0 0 ${padding}px`);
+                    });
+            });
+    }
+
+
+    private addCodeSettings(container: HTMLElement, styles: any) {
+        // 代码块设置
+        const codeBlockSection = container.createDiv('style-section');
+
+        // 创建折叠面板标题区域
+        const codeBlockHeader = codeBlockSection.createDiv('style-section-header');
+        const codeBlockTitleContainer = codeBlockHeader.createDiv('style-section-title');
+        const codeBlockToggle = codeBlockTitleContainer.createSpan('style-section-toggle');
+        setIcon(codeBlockToggle, 'chevron-right');
+        codeBlockTitleContainer.createEl('h4', { text: '代码块样式' });
+
+        // 创建内容区域
+        const codeBlockContent = codeBlockSection.createDiv('style-section-content');
+        codeBlockContent.hide(); // 默认隐藏
+
+        // 折叠面板点击事件
+        codeBlockHeader.addEventListener('click', () => {
+            const isExpanded = !codeBlockSection.hasClass('is-expanded');
+            codeBlockSection.toggleClass('is-expanded', isExpanded);
+            setIcon(codeBlockToggle, isExpanded ? 'chevron-down' : 'chevron-right');
+            codeBlockContent.toggle(isExpanded);
+        });
+
+        new Setting(codeBlockContent)
+            .setName('背景颜色')
+            .setDesc('设置代码块的背景颜色')
+            .addColorPicker(color => {
+                const currentBg = styles.block.match(/background:\s*(#[a-fA-F0-9]+)/)?.[1];
+                color.setValue(currentBg)
+                    .onChange(value => {
+                        styles.block = styles.block.replace(/background:\s*#[a-fA-F0-9]+/, `background: ${value}`);
+                    });
+            });
+
+        new Setting(codeBlockContent)
+            .setName('文本颜色')
+            .setDesc('设置代码块内文本的颜色')
+            .addColorPicker(color => {
+                const currentColor = styles.block.match(/color:\s*(#[a-fA-F0-9]+)/)?.[1];
+                color.setValue(currentColor)
+                    .onChange(value => {
+                        styles.block = styles.block.replace(/color:\s*#[a-fA-F0-9]+/, `color: ${value}`);
+                    });
+            });
+
+        new Setting(codeBlockContent)
+            .setName('圆角大小')
+            .setDesc('设置代码块的圆角大小（单位：像素）')
+            .addText(text => {
+                const currentRadius = styles.block.match(/border-radius:\s*(\d+)px/)?.[1];
+                text.setValue(currentRadius)
+                    .onChange(value => {
+                        const radius = parseInt(value) || 8;
+                        styles.block = styles.block.replace(/border-radius:\s*\d+px/, `border-radius: ${radius}px`);
+                    });
+            });
+
+        // 行内代码设置
+        const inlineCodeSection = container.createDiv('style-section');
+
+        // 创建折叠面板标题区域
+        const inlineCodeHeader = inlineCodeSection.createDiv('style-section-header');
+        const inlineCodeTitleContainer = inlineCodeHeader.createDiv('style-section-title');
+        const inlineCodeToggle = inlineCodeTitleContainer.createSpan('style-section-toggle');
+        setIcon(inlineCodeToggle, 'chevron-right');
+        inlineCodeTitleContainer.createEl('h4', { text: '行内代码样式' });
+
+        // 创建内容区域
+        const inlineCodeContent = inlineCodeSection.createDiv('style-section-content');
+        inlineCodeContent.hide(); // 默认隐藏
+
+        // 折叠面板点击事件
+        inlineCodeHeader.addEventListener('click', () => {
+            const isExpanded = !inlineCodeSection.hasClass('is-expanded');
+            inlineCodeSection.toggleClass('is-expanded', isExpanded);
+            setIcon(inlineCodeToggle, isExpanded ? 'chevron-down' : 'chevron-right');
+            inlineCodeContent.toggle(isExpanded);
+        });
+
+        new Setting(inlineCodeContent)
+            .setName('背景颜色')
+            .setDesc('设置行内代码的背景颜色')
+            .addColorPicker(color => {
+                const currentBg = styles.inline.match(/background:\s*(#[a-fA-F0-9]+)/)?.[1];
+                color.setValue(currentBg)
+                    .onChange(value => {
+                        styles.inline = styles.inline.replace(/background:\s*#[a-fA-F0-9]+/, `background: ${value}`);
+                    });
+            });
+
+        new Setting(inlineCodeContent)
+            .setName('文本颜色')
+            .setDesc('设置行内代码的文本颜色')
+            .addColorPicker(color => {
+                const currentColor = styles.inline.match(/color:\s*(#[a-fA-F0-9]+)/)?.[1];
+                color.setValue(currentColor)
+                    .onChange(value => {
+                        styles.inline = styles.inline.replace(/color:\s*#[a-fA-F0-9]+/, `color: ${value}`);
+                    });
+            });
+    }
+
+
+
+    private addLinkSettings(container: HTMLElement, styles: any) {
+        const linkSection = container.createDiv('link-section');
+
+        new Setting(linkSection)
+            .setName('链接颜色')
+            .setDesc('设置链接文本的颜色')
+            .addColorPicker(color => {
+                const currentColor = styles.link.match(/color:\s*(#[a-fA-F0-9]+)/)?.[1];
+                color.setValue(currentColor)
+                    .onChange(value => {
+                        styles.link = styles.link.replace(/color:\s*#[a-fA-F0-9]+/, `color: ${value}`);
+
+                        // 如果有下划线渐变，也更新下划线颜色
+                        if (styles.link.includes('linear-gradient')) {
+                            styles.link = styles.link.replace(/linear-gradient\([^)]+\)/, `linear-gradient(to right, ${value}80, ${value}80)`);
+                        }
+                    });
+            });
+
+        new Setting(linkSection)
+            .setName('下划线样式')
+            .setDesc('选择链接的下划线样式')
+            .addDropdown(dropdown => {
+                dropdown.addOption('none', '无下划线')
+                    .addOption('underline', '实线下划线')
+                    .addOption('gradient', '渐变下划线')
+                    .setValue(styles.link.includes('text-decoration: none') && !styles.link.includes('background-image') ? 'none' :
+                        styles.link.includes('text-decoration: underline') ? 'underline' : 'gradient')
+                    .onChange(value => {
+                        switch (value) {
+                            case 'none':
+                                styles.link = styles.link.replace(/text-decoration:[^;]+;/, 'text-decoration: none;')
+                                    .replace(/background-image:[^;]+;/, '')
+                                    .replace(/background-size:[^;]+;/, '')
+                                    .replace(/background-repeat:[^;]+;/, '')
+                                    .replace(/background-position:[^;]+;/, '');
+                                break;
+                            case 'underline':
+                                styles.link = styles.link.replace(/text-decoration:[^;]+;/, 'text-decoration: underline;')
+                                    .replace(/background-image:[^;]+;/, '')
+                                    .replace(/background-size:[^;]+;/, '')
+                                    .replace(/background-repeat:[^;]+;/, '')
+                                    .replace(/background-position:[^;]+;/, '');
+                                break;
+                            case 'gradient':
+                                const color = styles.link.match(/color:\s*(#[a-fA-F0-9]+)/)?.[1] || '#d2691e';
+                                styles.link = styles.link.replace(/text-decoration:[^;]+;/, 'text-decoration: none;')
+                                    + ` background-image: linear-gradient(to right, ${color}80, ${color}80); background-size: 0% 1px; background-repeat: no-repeat; background-position: 0 100%; transition: all 0.3s ease;`;
+                                break;
+                        }
+                    });
+            });
+    }
+
+    private addTableSettings(container: HTMLElement, styles: any) {
+        const tableSection = container.createDiv('table-section');
+
+        new Setting(tableSection)
+            .setName('表格边框颜色')
+            .setDesc('设置表格边框和分隔线的颜色')
+            .addColorPicker(color => {
+                const currentBorder = styles.container.match(/border:\s*1px\s*solid\s*(#[a-fA-F0-9]+)/)?.[1];
+                color.setValue(currentBorder)
+                    .onChange(value => {
+                        styles.container = styles.container.replace(/border:\s*1px\s*solid\s*#[a-fA-F0-9]+/, `border: 1px solid ${value}`);
+                        styles.header = styles.header.replace(/border-bottom:\s*\d+px\s*solid\s*#[a-fA-F0-9]+/, `border-bottom: 2px solid ${value}`);
+                        styles.cell = styles.cell.replace(/border-top:\s*1px\s*solid\s*#[a-fA-F0-9]+/, `border-top: 1px solid ${value}`);
+                    });
+            });
+
+        new Setting(tableSection)
+            .setName('表头背景')
+            .setDesc('设置表格头部的背景颜色')
+            .addColorPicker(color => {
+                const currentBg = styles.header.match(/background:\s*([^;]+)/)?.[1];
+                // 如果是渐变色，取第一个颜色
+                const firstColor = currentBg.includes('linear-gradient') ?
+                    currentBg.match(/linear-gradient\([^,]+,\s*(#[a-fA-F0-9]+)/)?.[1] :
+                    currentBg;
+
+                color.setValue(firstColor)
+                    .onChange(value => {
+                        if (currentBg.includes('linear-gradient')) {
+                            styles.header = styles.header.replace(/background:\s*linear-gradient\([^)]+\)/, `background: linear-gradient(135deg, ${value}, #fffaf5)`);
+                        } else {
+                            styles.header = styles.header.replace(/background:\s*[^;]+/, `background: ${value}`);
+                        }
+                    });
+            });
+
+        new Setting(tableSection)
+            .setName('圆角大小')
+            .setDesc('设置表格的圆角大小（单位：像素）')
+            .addText(text => {
+                const currentRadius = styles.container.match(/border-radius:\s*(\d+)px/)?.[1];
+                text.setValue(currentRadius)
+                    .onChange(value => {
+                        const radius = parseInt(value) || 12;
+                        styles.container = styles.container.replace(/border-radius:\s*\d+px/, `border-radius: ${radius}px`);
+                    });
+            });
+    }
+
+    private addHrSettings(container: HTMLElement, styles: any) {
+        const hrSection = container.createDiv('hr-section');
+
+        new Setting(hrSection)
+            .setName('分隔线颜色')
+            .setDesc('设置水平分隔线的颜色')
+            .addColorPicker(color => {
+                const currentColor = styles.hr.match(/border-top:\s*\d+px\s*solid\s*(#[a-fA-F0-9]+)/)?.[1];
+                color.setValue(currentColor)
+                    .onChange(value => {
+                        styles.hr = styles.hr.replace(/border-top:\s*\d+px\s*solid\s*#[a-fA-F0-9]+/, `border-top: 2px solid ${value}`);
+                    });
+            });
+
+        new Setting(hrSection)
+            .setName('分隔线粗细')
+            .setDesc('设置水平分隔线的粗细（单位：像素）')
+            .addText(text => {
+                const currentWidth = styles.hr.match(/border-top:\s*(\d+)px/)?.[1];
+                text.setValue(currentWidth)
+                    .onChange(value => {
+                        const width = parseInt(value) || 2;
+                        styles.hr = styles.hr.replace(/border-top:\s*\d+px/, `border-top: ${width}px`);
+                    });
+            });
+
+        new Setting(hrSection)
+            .setName('上下边距')
+            .setDesc('设置分隔线与上下内容的间距（单位：像素）')
+            .addText(text => {
+                const currentMargin = styles.hr.match(/margin:\s*(\d+)px/)?.[1];
+                text.setValue(currentMargin)
+                    .onChange(value => {
+                        const margin = parseInt(value) || 28;
+                        styles.hr = styles.hr.replace(/margin:\s*\d+px/, `margin: ${margin}px`);
+                    });
+            });
+    }
+
+    private addFootnoteSettings(container: HTMLElement, styles: any) {
+        const footnoteSection = container.createDiv('footnote-section');
+
+        new Setting(footnoteSection)
+            .setName('脚注颜色')
+            .setDesc('设置脚注引用和返回链接的颜色')
+            .addColorPicker(color => {
+                const currentColor = styles.ref.match(/color:\s*(#[a-fA-F0-9]+)/)?.[1];
+                color.setValue(currentColor)
+                    .onChange(value => {
+                        styles.ref = styles.ref.replace(/color:\s*#[a-fA-F0-9]+/, `color: ${value}`);
+                        styles.backref = styles.backref.replace(/color:\s*#[a-fA-F0-9]+/, `color: ${value}`);
+                    });
+            });
+
+        new Setting(footnoteSection)
+            .setName('字体样式')
+            .setDesc('选择脚注的字体样式')
+            .addDropdown(dropdown => {
+                dropdown.addOption('normal', '常规')
+                    .addOption('italic', '斜体')
+                    .setValue(styles.ref.includes('font-style: italic') ? 'italic' : 'normal')
+                    .onChange(value => {
+                        const style = value === 'italic' ? 'italic' : 'normal';
+                        styles.ref = styles.ref.replace(/font-style:[^;]*;/, `font-style: ${style};`);
+                        styles.backref = styles.backref.replace(/font-style:[^;]*;/, `font-style: ${style};`);
+                    });
+            });
+    }
+
+    private addImageSettings(container: HTMLElement, styles: any) {
+        const imageSection = container.createDiv('image-section');
+
+        new Setting(imageSection)
+            .setName('最大宽度')
+            .setDesc('设置图片的最大显示宽度（支持百分比或像素值，例如：100% 或 800px）')
+            .addText(text => {
+                const currentWidth = styles.image.match(/max-width:\s*([^;]+)/)?.[1];
+                text.setValue(currentWidth)
+                    .onChange(value => {
+                        // 验证输入值是否为有效的宽度值
+                        const isValid = /^\d+(%|px)$/.test(value.trim());
+                        const width = isValid ? value.trim() : '100%';
+                        styles.image = styles.image.replace(/max-width:\s*[^;]+/, `max-width: ${width}`);
+                    });
+            });
+
+        new Setting(imageSection)
+            .setName('边距')
+            .setDesc('设置图片与上下文本的间距（单位：em）')
+            .addText(text => {
+                const currentMargin = styles.image.match(/margin:\s*([\d.]+)em/)?.[1];
+                text.setValue(currentMargin)
+                    .onChange(value => {
+                        const margin = parseFloat(value) || 1.5;
+                        styles.image = styles.image.replace(/margin:\s*[\d.]+em/, `margin: ${margin}em`);
+                    });
+            });
+
+        new Setting(imageSection)
+            .setName('圆角大小')
+            .setDesc('设置图片的圆角程度（单位：像素）')
+            .addText(text => {
+                const currentRadius = styles.image.match(/border-radius:\s*(\d+)px/)?.[1];
+                text.setValue(currentRadius)
+                    .onChange(value => {
+                        const radius = parseInt(value) || 8;
+                        styles.image = styles.image.replace(/border-radius:\s*\d+px/, `border-radius: ${radius}px`);
+                    });
+            });
+
+        new Setting(imageSection)
+            .setName('边框颜色')
+            .setDesc('设置图片边框的颜色')
+            .addColorPicker(color => {
+                const currentColor = styles.image.match(/border:\s*1px solid\s*(#[a-fA-F0-9]+)/)?.[1];
+                color.setValue(currentColor)
+                    .onChange(value => {
+                        styles.image = styles.image.replace(/border:\s*1px solid\s*#[a-fA-F0-9]+80/, `border: 1px solid ${value}80`);
+                    });
+            });
+    }
+
+    private async validateAndSubmit(): Promise<boolean> {
+        const trimmedName = this.template.name.trim();
+
+        if (!trimmedName) {
+            new Notice('模板名称不能为空');
+            this.nameInput.focus();
+            return false;
+        }
+
+        try {
+            await this.onSubmit(this.template);
+            return true;
+        } catch (error) {
+            new Notice('保存失败：' + error.message, 3000);
+            return false;
+        }
+    }
+
+    private generateTemplateId(name: string): string {
+        // 生成模板ID的逻辑
+        return `template-${name}`;
+    }
+
+    onClose() {
+        const { contentEl } = this;
+        contentEl.empty();
+    }
+}
