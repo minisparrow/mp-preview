@@ -1,4 +1,4 @@
-import { App, Modal, Setting, Notice, setIcon } from 'obsidian';
+import { App, Modal, Setting, Notice, setIcon, ColorComponent } from 'obsidian';
 import { Template } from '../templateManager';
 
 export class CreateTemplateModal extends Modal {
@@ -24,23 +24,23 @@ export class CreateTemplateModal extends Modal {
             container: "",
             title: {
                 h1: {
-                    base: "margin: 32px 0 0; font-size: 2em; letter-spacing: -0.03em; line-height: 1.5;",
-                    content: "font-weight: bold; color: #d64b3b;",
+                    base: "margin: 28px 0 0; font-size: 28px; letter-spacing: -0.03em; line-height: 1.5; text-align: center;",
+                    content: "font-weight: bold; color: #666b8f; display: inline-block;",
                     after: ""
                 },
                 h2: {
-                    base: "margin: 28px 0 0; font-size: 1.5em; letter-spacing: -0.02em; border-bottom: 2px solid #ef7060; line-height: 1.2;",
-                    content: "display: inline-block; font-weight: bold; background: #ef7060; color: #ffffff; padding: 1px 4px; border-top-right-radius: 3px; border-top-left-radius: 3px; margin-right: 3px;",
-                    after: "display: inline-block; content: ' '; vertical-align: bottom; border-bottom: 28px solid #fff5f4; border-right: 20px solid transparent;"
+                    base: "margin: 24px 0 0; font-size: 24px; letter-spacing: -0.02em; line-height: 1.5; border-bottom: 1px solid rgba(122,125,160,0.2);",
+                    content: "font-weight: bold; color: #ffffff; background: #7a7da0; padding: 1px 4px; border-radius: 3px;",
+                    after: ""
                 },
                 h3: {
-                    base: "margin: 24px 0 0; font-size: 1.25em; letter-spacing: -0.01em; line-height: 1.5;",
-                    content: "font-weight: bold; color: #f18070;",
+                    base: "margin: 20px 0 0; font-size: 20px; letter-spacing: -0.01em; line-height: 1.5;",
+                    content: "font-weight: bold; color: #7a7da0; padding: 1px 1px;",
                     after: ""
                 },
                 base: {
-                    base: "margin: 20px 0 14px; font-size: 1em; line-height: 1.5;",
-                    content: "font-weight: bold; color: #f39080;",
+                    base: "margin: 16px 0 0; font-size: 16px;",
+                    content: "font-weight: bold; color: #7a7da0;",
                     after: ""
                 }
             },
@@ -51,23 +51,23 @@ export class CreateTemplateModal extends Modal {
                 taskList: "list-style: none; margin-left: -24px; font-size: 1em; color: #4a4a4a; line-height: 1.8;"
             },
             code: {
-                block: "background: #fff8f7; padding: 0.5em 1em 1em; border-radius: 8px; font-size: 14px; font-family: Operator Mono, Consolas, Monaco, Menlo, monospace; line-height: 1.6; white-space: pre; overflow-x: auto; word-wrap: normal; color: #333; margin: 1.2em 0; border: 1px solid #ffe8e6; box-shadow: 0 2px 4px rgba(239,112,96,0.05); width: 100%;",
-                inline: "background: #fff8f7; padding: 2px 6px; border-radius: 4px; color: #333; font-size: 14px; font-family: Operator Mono, Consolas, Monaco, Menlo, monospace; border: 1px solid #ffe8e6;"
+                block: "background: #f8f9fc; padding: 0.5em 1em 1em; border-radius: 8px; font-size: 14px; font-family: Operator Mono, Consolas, Monaco, Menlo, monospace; line-height: 1.6; white-space: pre; overflow-x: auto; word-wrap: normal; color: #333; margin: 1.2em 0; border: 1px solid #eef0f7; box-shadow: 0 2px 4px rgba(122,125,160,0.05); width: 100%;",
+                inline: "background: #f8f9fc; padding: 2px 6px; border-radius: 4px; color: #333; font-size: 14px; font-family: Operator Mono, Consolas, Monaco, Menlo, monospace; border: 1px solid #eef0f7;"
             },
-            quote: "border-left: 4px solid #ef7060; border-radius: 6px; padding: 16px 20px; background: #fff5f4; margin: 0.8em 0; color: #d64b3b; font-style: italic; font-size: 1em; word-wrap: break-word;",
+            quote: "border-left: 4px solid #7a7da0; border-radius: 6px; padding: 16px 20px; background: #f8f9fc; margin: 0.8em 0; color: #666b8f; font-style: italic; font-size: 1em; word-wrap: break-word;",
             image: "max-width: 100%; height: auto; margin: 1em auto; display: block;",
-            link: "color: #ef7060; text-decoration: none; border-bottom: 1px solid #ef7060; transition: all 0.2s ease;",
+            link: "color: #7a7da0; text-decoration: none; border-bottom: 1px solid #7a7da0; transition: all 0.2s ease;",
             emphasis: {
                 strong: "font-weight: bold; color: #4a4a4a;",
                 em: "font-style: italic; color: #4a4a4a;",
                 del: "text-decoration: line-through; color: #4a4a4a;"
             },
             table: {
-                container: "width: 100%; margin: 1em 0; border-collapse: collapse; border: 1px solid #ffe8e6;",
-                header: "background: #fff8f7; font-weight: bold; color: #4a4a4a; border-bottom: 2px solid #ffe8e6; font-size: 1em;",
+                container: "width: 100%; margin: 1em 0; border-collapse: collapse; border: 1px solid #e1e4e8;",
+                header: "background: #f8f9fc; font-weight: bold; color: #4a4a4a; border-bottom: 2px solid #e1e4e8; font-size: 1em;",
                 cell: "border: 1px solid #f0f0f0; padding: 8px; color: #4a4a4a; font-size: 1em;"
             },
-            hr: "border: none; border-top: 1px solid #ffe8e6; margin: 20px 0;",
+            hr: "border: none; border-top: 1px solid #eef0f7; margin: 20px 0;",
             footnote: {
                 ref: "color: #e0e0e0; text-decoration: none; font-size: 0.9em;",
                 backref: "color: #e0e0e0; text-decoration: none; font-size: 0.9em;"
@@ -379,7 +379,17 @@ export class CreateTemplateModal extends Modal {
                             }
                         });
                 });
-
+            new Setting(content)
+                .setName('字体大小')
+                .setDesc('设置标题的字体大小（单位：像素）')
+                .addText(text => {
+                    const currentSize = styles[level].base.match(/font-size:\s*(\d+)px/)?.[1];
+                    text.setValue(currentSize)
+                        .onChange(value => {
+                            const size = parseInt(value) || 16;
+                            styles[level].base = styles[level].base.replace(/font-size:\s*\d+px/, `font-size: ${size}px`);
+                        });
+                });
             new Setting(content)
                 .setName('字体颜色')
                 .setDesc('设置标题的字体颜色')
@@ -395,9 +405,22 @@ export class CreateTemplateModal extends Modal {
                         });
                 });
 
+            let colorPicker: ColorComponent; // 定义 colorPicker 变量
             new Setting(content)
                 .setName('背景颜色')
                 .setDesc('设置标题的背景颜色')
+                .addToggle(toggle => {
+                    const hasBackground = styles[level].content.includes('background:');
+                    toggle.setValue(hasBackground)
+                        .onChange(value => {
+                            if (!value) {
+                                styles[level].content = styles[level].content.replace(/background:\s*#[a-fA-F0-9]+;/, '');
+                                colorPicker.setDisabled(true);
+                            } else {
+                                colorPicker.setDisabled(false);
+                            }
+                        });
+                })
                 .addColorPicker(color => {
                     const currentBg = styles[level].content.match(/background:\s*(#[a-fA-F0-9]+)/)?.[1];
                     color.setValue(currentBg)
@@ -412,6 +435,7 @@ export class CreateTemplateModal extends Modal {
                                 styles[level].content += ' padding: 1px 4px; border-radius: 3px;';
                             }
                         });
+                    colorPicker = color; // 保存 colorPicker 变量
                 });
 
             new Setting(content)
@@ -442,7 +466,7 @@ export class CreateTemplateModal extends Modal {
                         });
                 });
 
-            new Setting(content)
+                new Setting(content)
                 .setName('下划线')
                 .setDesc('设置标题下划线是否显示')
                 .addToggle(toggle => {
@@ -452,32 +476,14 @@ export class CreateTemplateModal extends Modal {
                             const fontColor = styles[level].content.match(/color:\s*(#[a-fA-F0-9]+)/)?.[1];
                             const bgColor = styles[level].content.match(/background:\s*(#[a-fA-F0-9]+)/)?.[1];
                             let underlineColor = fontColor !== '#ffffff' ? fontColor : bgColor !== '#ffffff' ? bgColor : '#000000';
+            
+                            // 将颜色转换为rgba格式
+                            const rgbaColor = `rgba(${parseInt(underlineColor.slice(1, 3), 16)}, ${parseInt(underlineColor.slice(3, 5), 16)}, ${parseInt(underlineColor.slice(5, 7), 16)}, 0.2)`;
+            
                             if (value) {
-                                styles[level].base += ` border-bottom: 1px solid ${underlineColor};`;
+                                styles[level].base += ` border-bottom: 1px solid ${rgbaColor};`;
                             } else {
                                 styles[level].base = styles[level].base.replace(/border-bottom:[^;]+;/, '');
-                            }
-                        });
-                });
-            new Setting(content)
-                .setName('阴影效果')
-                .setDesc('选择标题的阴影效果')
-                .addDropdown(dropdown => {
-                    dropdown.addOption('none', '无阴影')
-                        .addOption('small', '小阴影')
-                        .addOption('large', '大阴影')
-                        .setValue(styles[level].after.includes('box-shadow') ? 'large' : 'none')
-                        .onChange(value => {
-                            switch (value) {
-                                case 'none':
-                                    styles[level].after = styles[level].after.replace(/box-shadow:[^;]+;/, '');
-                                    break;
-                                case 'small':
-                                    styles[level].after += ' box-shadow: 0 1px 3px rgba(0,0,0,0.1);';
-                                    break;
-                                case 'large':
-                                    styles[level].after += ' box-shadow: 0 4px 6px rgba(0,0,0,0.1);';
-                                    break;
                             }
                         });
                 });
