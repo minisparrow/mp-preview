@@ -1,7 +1,7 @@
 # MP Preview
 一键将 Obsidian 笔记转换为微信公众号格式的插件。
 
-![downloads](https://img.shields.io/badge/downloads-1K-brightgreen) ![version](https://img.shields.io/badge/version-1.0.0-blue) ![license](https://img.shields.io/badge/license-MIT-green) [![donate](https://img.shields.io/badge/打赏-支持作者-orange)](https://github.com/YeBan/mp-preview#支持作者)
+![downloads](https://img.shields.io/badge/downloads-1K-brightgreen) ![version](https://img.shields.io/badge/version-1.0.0-blue) ![license](https://img.shields.io/badge/license-MIT-green)  [![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-支持作者-yellow)](https://ko-fi.com/bruceyeban)
 
 ## 功能特点
 - 📝 一键将 Markdown 文档转换为微信公众号格式
@@ -30,7 +30,7 @@
 6. 点击安装并启用插件
 
 ### 手动安装
-1. 下载最新版本的 release 文件
+1. 下载最新版本的 release 文件：https://github.com/Yeban8090/mp-preview/releases
 2. 解压后将文件夹复制到 Obsidian 插件目录：`{vault}/.obsidian/plugins/`
 3. 重启 Obsidian
 4. 在设置中启用插件
@@ -50,7 +50,7 @@
 如果这个插件对你有所帮助，可以考虑请作者喝杯咖啡 ☕：
 - 微信支付
 - 支付宝
-- Buy Me a Coffee
+- [![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-支持作者-yellow)](https://ko-fi.com/bruceyeban)
 
 您的支持是我持续改进这个插件的动力！
 

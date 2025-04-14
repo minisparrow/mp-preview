@@ -3,7 +3,7 @@ import { MPConverter } from './converter';
 import { CopyManager } from './copyManager';
 import type { TemplateManager } from './templateManager';
 import { DonateManager } from './donateManager';
-import type { SettingsManager } from './settings';
+import type { SettingsManager } from './settings/settings';
 import { BackgroundManager } from './backgroundManager';
 export const VIEW_TYPE_MP = 'mp-preview';
 
@@ -496,8 +496,8 @@ export class MPView extends ItemView {
 
     // 获取模板选项
     private async getTemplateOptions() {
-        await this.templateManager.loadTemplates();
-        const templates = this.templateManager.getAllTemplates();
+
+        const templates = this.settingsManager.getVisibleTemplates();
         
         return templates.length > 0
             ? templates.map(t => ({ value: t.id, label: t.name }))
@@ -506,27 +506,6 @@ export class MPView extends ItemView {
 
     // 获取字体选项
     private getFontOptions() {
-        return [
-            { 
-                value: 'Optima-Regular, Optima, PingFangSC-light, PingFangTC-light, "PingFang SC", Cambria, Cochin, Georgia, Times, "Times New Roman", serif',
-                label: '默认字体'
-            },
-            { 
-                value: 'SimSun, "宋体", serif',
-                label: '宋体'
-            },
-            { 
-                value: 'SimHei, "黑体", sans-serif',
-                label: '黑体'
-            },
-            { 
-                value: 'KaiTi, "楷体", serif',
-                label: '楷体'
-            },
-            { 
-                value: '"Microsoft YaHei", "微软雅黑", sans-serif',
-                label: '雅黑'
-            }
-        ];
+        return this.settingsManager.getFontOptions();
     }
 }
