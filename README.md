@@ -1,7 +1,7 @@
 # MP Preview
 一键将 Obsidian 笔记转换为微信公众号格式的插件。
 
-![downloads](https://img.shields.io/badge/downloads-1K-brightgreen) ![version](https://img.shields.io/badge/version-1.0.0-blue) ![license](https://img.shields.io/badge/license-MIT-green)  [![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-支持作者-yellow)](https://ko-fi.com/bruceyeban)
+![downloads](https://img.shields.io/badge/downloads-1K-brightgreen) ![version](https://img.shields.io/badge/version-1.0.1-blue) ![license](https://img.shields.io/badge/license-MIT-green)  [![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-支持作者-yellow)](https://ko-fi.com/bruceyeban)
 
 ## 功能特点
 - 📝 一键将 Markdown 文档转换为微信公众号格式

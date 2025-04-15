@@ -74,6 +74,7 @@ export class MPSettingTab extends PluginSettingTab {
                             .onClick(() => {
                                 new CreateTemplateModal(
                                     this.app,
+                                    this.plugin,
                                     (updatedTemplate) => {
                                         this.plugin.settingsManager.updateTemplate(template.id, updatedTemplate);
                                         this.display();
@@ -108,6 +109,7 @@ export class MPSettingTab extends PluginSettingTab {
                 .onClick(() => {
                     new CreateTemplateModal(
                         this.app,
+                        this.plugin,
                         async (newTemplate) => {
                             await this.plugin.settingsManager.addCustomTemplate(newTemplate);
                             this.display();

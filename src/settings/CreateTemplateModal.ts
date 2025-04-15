@@ -1,16 +1,22 @@
 import { App, Modal, Setting, Notice, setIcon, ColorComponent } from 'obsidian';
+import MPPlugin from '../main';
 import { Template } from '../templateManager';
 
 export class CreateTemplateModal extends Modal {
     private template: Template;
     private onSubmit: (template: Template) => void;
     private nameInput: HTMLInputElement;
-
-    constructor(app: App, onSubmit: (template: Template) => void, existingTemplate?: Template) {
+    private plugin: MPPlugin;
+    private templateSelect: HTMLSelectElement;
+    private showSampleTemplate = false;
+    private existingTemplate: Template | undefined;
+    constructor(app: App, plugin: MPPlugin, onSubmit: (template: Template) => void, existingTemplate?: Template) {
         super(app);
+        this.plugin = plugin;
+        this.existingTemplate = existingTemplate;
         this.onSubmit = onSubmit;
         this.template = existingTemplate ? { ...existingTemplate } : {
-            id: this.generateTemplateId('未命名模板'),
+            id: '',
             name: '',
             description: '',
             isPreset: false,
@@ -91,6 +97,34 @@ export class CreateTemplateModal extends Modal {
 
         // 创建模板名称输入区域（在头部）
         const nameContainer = headerEl.createDiv('name-container');
+        if (!this.existingTemplate) {
+            new Setting(nameContainer)
+                .setName('是否选择参考模板')
+                .addToggle(toggle => {
+                    toggle.setValue(this.showSampleTemplate)
+                        .onChange(value => {
+                            this.showSampleTemplate = value;
+                            this.templateSelect.style.display = this.showSampleTemplate ? 'block' : 'none';
+                        });
+                });
+
+            // 添加选择框
+            new Setting(nameContainer)
+                .setName('选择参考模板')
+                .addDropdown(dropdown => {
+                    this.templateSelect = dropdown
+                        .addOptions(this.getTemplateOptions()) // 获取所有主题选项
+                        .setValue(this.template.id)
+                        .onChange(value => {
+                            const selectedTemplate = this.getTemplateById(value);
+                            if (selectedTemplate) {
+                                this.template = { ...selectedTemplate, id: '', name: '', description: '', isPreset: false };
+                            }
+                        })
+                        .selectEl;
+                    this.templateSelect.style.display = this.showSampleTemplate ? 'block' : 'none'; // 默认隐藏
+                });
+        }
         new Setting(nameContainer)
             .setName('模板名称')
             .addText(text => {
@@ -166,6 +200,19 @@ export class CreateTemplateModal extends Modal {
                 }
             }
         });
+    }
+
+    private getTemplateOptions(): Record<string, string> {
+        const templates = this.plugin.settingsManager.getAllTemplates();
+        const options: Record<string, string> = {};
+        templates.forEach(template => {
+            options[template.id] = template.name;
+        });
+        return options;
+    }
+
+    private getTemplateById(id: string): Template | undefined {
+        return this.plugin.settingsManager.getAllTemplates().find(template => template.id === id);
     }
 
     private addStyleSettings(container: HTMLElement, sectionName: string, styles: any) {
@@ -1145,6 +1192,13 @@ export class CreateTemplateModal extends Modal {
         if (!trimmedName) {
             new Notice('模板名称不能为空');
             this.nameInput.focus();
+            return false;
+        }
+
+        // 检查是否选择了样本模板
+        if (this.showSampleTemplate && !this.templateSelect.value) {
+            new Notice('请选择一个参考模板');
+            this.templateSelect.focus();
             return false;
         }
 
