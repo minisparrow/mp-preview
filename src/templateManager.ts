@@ -39,6 +39,11 @@ export interface Template {
         };
         quote: string;
         code: {
+            header: {
+                container: string;
+                dot: string;
+                colors: [string, string, string];
+            };
             block: string;
             inline: string;
         };
@@ -108,7 +113,7 @@ export class TemplateManager {
                     }
                     el.textContent = '';
                     el.appendChild(content);
-                    
+
                     const after = document.createElement('span');
                     after.className = 'after';
                     el.appendChild(after);
@@ -150,10 +155,23 @@ export class TemplateManager {
 
         // 应用代码样式
         element.querySelectorAll('pre').forEach(el => {
-            el.setAttribute('style', `${styles.code.block}; font-size: ${this.currentFontSize}px;`);
+            // 应用基础代码块样式
+            el.setAttribute('style', styles.code.block);
+
+            // 设置代码块头部样式
+            const header = el.querySelector('.mp-code-header');
+            if (header) {
+                header.setAttribute('style', styles.code.header.container);
+                // 设置窗口按钮样式
+                header.querySelectorAll('.mp-code-dot').forEach((dot, index) => {
+                    dot.setAttribute('style', `${styles.code.header.dot}; background-color: ${styles.code.header.colors[index]};`);
+                });
+            }
         });
+
+        // 应用内联代码样式
         element.querySelectorAll('code:not(pre code)').forEach(el => {
-            el.setAttribute('style', `${styles.code.inline}; font-size: ${this.currentFontSize}px;`);
+            el.setAttribute('style', styles.code.inline);
         });
 
         // 应用链接样式
@@ -199,33 +217,7 @@ export class TemplateManager {
         // 应用图片样式
         element.querySelectorAll('img').forEach(el => {
             const img = el as HTMLImageElement;
-            el.setAttribute('style', `${styles.image}; font-family: ${this.currentFont};`);
-
-            const parent = img.parentElement;
-            if (parent && parent.tagName.toLowerCase() === 'p') {
-                if (parent.childNodes.length === 1) {
-                    parent.style.textAlign = 'center';
-                    parent.style.margin = '1em 0';
-                }
-            }
-        });
-
-        // 更新代码块样式
-        element.querySelectorAll('pre').forEach(el => {
-            el.setAttribute('style', `${styles.code.block};`);
-        });
-
-        // 更新引用块样式
-        element.querySelectorAll('blockquote').forEach(el => {
-            el.setAttribute('style', `${styles.quote};`);
-        });
-
-        // 更新列表样式
-        element.querySelectorAll('ul, ol').forEach(el => {
-            el.setAttribute('style', `${styles.list.container}; font-family: ${this.currentFont};`);
-        });
-        element.querySelectorAll('li').forEach(el => {
-            el.setAttribute('style', `${styles.list.item}; font-family: ${this.currentFont}; font-size: ${this.currentFontSize}px;`);
+            el.setAttribute('style', styles.image);
         });
     }
 }

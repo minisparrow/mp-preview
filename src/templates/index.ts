@@ -8,8 +8,6 @@ const darkTemplate = require('./dark.json');
 const academicTemplate = require('./academic.json');
 const yebanTemplate = require('./yeban.json');
 const yebanOrangeTemplate = require('./yeban-orange.json');
-const yebanScarletTemplate = require('./yeban-scarlet.json');
-const yebanNavyTemplate = require('./yeban-navy.json');
 const darkgreenTemplate = require('./darkgreen.json');
 const brownTemplate = require('./brown.json');
 
@@ -23,8 +21,6 @@ export const templates = {
     academic: academicTemplate,
     yeban: yebanTemplate,
     'yeban-orange': yebanOrangeTemplate,
-    'yeban-scarlet': yebanScarletTemplate,
-    'yeban-navy': yebanNavyTemplate,
     darkgreen: darkgreenTemplate,
     brown: brownTemplate,
 };

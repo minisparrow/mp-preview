@@ -26,7 +26,6 @@
             }
         },
         "paragraph": "line-height: 1.8; margin-bottom: 1.2em; font-size: 1em; color: #4a4a4a;",
-        "quote": "border-left: 4px solid #8D6E63; border-radius: 6px; padding: 16px 20px; background: #EFEBE9; margin: 0.8em 0; color: #5D4037; font-style: italic; font-size: 1em; word-wrap: break-word;",
         "link": "color: #795548; text-decoration: none; border-bottom: 1px solid #8D6E63; transition: all 0.2s ease;",
         "emphasis": {
             "strong": "font-weight: 600; color: #4a4a4a;",
@@ -39,9 +38,15 @@
             "taskList": "list-style: none; margin-left: -24px; font-size: 1em; color: #4a4a4a; line-height: 1.8;"
         },
         "code": {
-            "block": "background: #f8f8f8; padding: 0.5em 1em 1em; border-radius: 8px; font-size: 14px; font-family: Operator Mono, Consolas, Monaco, Menlo, monospace; line-height: 1.6; white-space: pre; overflow-x: auto; word-wrap: normal; color: #333; margin: 1.2em 0; border: 1px solid #eee; box-shadow: 0 2px 4px rgba(0,0,0,0.05); width: 100%;",
-            "inline": "background: #f8f8f8; padding: 2px 6px; border-radius: 4px; color: #333; font-size: 14px; font-family: Operator Mono, Consolas, Monaco, Menlo, monospace; border: 1px solid #eee;"
+            "header": {
+                "container": "position: absolute; top: 8px; left: 8px; display: flex; gap: 6px;",
+                "dot": "width: 12px; height: 12px; border-radius: 50%;",
+                "colors": ["#ff5f56", "#ffbd2e", "#27c93f"]
+            },
+            "block": "position: relative; color: #5D4037; background: #EFEBE9; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin: 1.2em 0; padding: 2em 1em 1em;  font-size: 14px; line-height: 1.6; white-space: pre-wrap;",
+            "inline": "background: #EFEBE9; padding: 2px 6px; border-radius: 4px; color: #5D4037; font-size: 14px; border: 1px solid #8D6E63;"
         },
+        "quote": "border-left: 4px solid #8D6E63; border-radius: 6px; padding: 10px 10px; background: #EFEBE9; margin: 0.8em 0; color: #5D4037; font-style: italic; word-wrap: break-word;",
         "image": "max-width: 100%; height: auto; margin: 1em auto; display: block;",
         "table": {
             "container": "width: 100%; margin: 1em 0; border-collapse: collapse; border: 1px solid #e1e4e8;",

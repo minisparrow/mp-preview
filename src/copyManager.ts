@@ -1,33 +1,32 @@
 import { Notice } from 'obsidian';
 
 export class CopyManager {
-    private static cleanupHtml(html: string): string {
-        // 创建一个临时的 div 元素来处理 HTML
-        const tempDiv = document.createElement('div');
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(html, 'text/html');
-        tempDiv.append(...Array.from(doc.body.childNodes));
-
-        // 移除所有的 data-* 属性
-        tempDiv.querySelectorAll('*').forEach(el => {
-            Array.from(el.attributes).forEach(attr => {
-                if (attr.name.startsWith('data-')) {
-                    el.removeAttribute(attr.name);
+    private static cleanupHtml(element: HTMLElement): string {
+        const clone = element.cloneNode(true) as HTMLElement;
+        
+        // 使用 DOM API 移除属性
+        clone.querySelectorAll('*').forEach(el => {
+            // 移除所有非样式属性
+            Array.from(el.attributes)
+                .filter(attr => !attr.name.startsWith('style'))
+                .forEach(attr => el.removeAttribute(attr.name));
+                
+            // 检查并清理 style 属性中的潜在危险内容
+            if (el.hasAttribute('style')) {
+                const style = el.getAttribute('style');
+                if (style?.includes('javascript:') || style?.includes('expression(')) {
+                    el.removeAttribute('style');
                 }
-            });
+            }
+
+            // 移除可能包含脚本的元素
+            if (el.tagName.toLowerCase() === 'script' || el.tagName.toLowerCase() === 'iframe') {
+                el.remove();
+            }
         });
 
-        // 移除所有的 class 属性
-        tempDiv.querySelectorAll('*').forEach(el => {
-            el.removeAttribute('class');
-        });
-
-        // 移除所有的 id 属性
-        tempDiv.querySelectorAll('*').forEach(el => {
-            el.removeAttribute('id');
-        });
-
-        return tempDiv.innerHTML;
+        const serializer = new XMLSerializer();
+        return serializer.serializeToString(clone);
     }
 
     private static async processImages(container: HTMLElement): Promise<void> {
@@ -55,30 +54,18 @@ export class CopyManager {
 
     public static async copyToClipboard(element: HTMLElement): Promise<void> {
         try {
-            const container = document.createElement('div');
-            container.style.position = 'absolute';
-            container.style.left = '-9999px';
-            
-            // 使用 cloneNode 复制内容
-            const clone = element.cloneNode(true);
-            container.append(clone);
-            document.body.appendChild(container);
-            
-            // 处理图片转换为 base64
-            await this.processImages(container);
+            const clone = element.cloneNode(true) as HTMLElement;
+            await this.processImages(clone);
 
-            // 清理 HTML
-            const cleanHtml = this.cleanupHtml(container.innerHTML);
+            // 使用新的 cleanupHtml 方法
+            const cleanHtml = this.cleanupHtml(clone);
             
-            // 创建剪贴板数据
             const clipData = new ClipboardItem({
                 'text/html': new Blob([cleanHtml], { type: 'text/html' }),
-                'text/plain': new Blob([container.textContent || ''], { type: 'text/plain' })
+                'text/plain': new Blob([clone.textContent || ''], { type: 'text/plain' })
             });
 
-            document.body.removeChild(container);
             await navigator.clipboard.write([clipData]);
-            
             new Notice('已复制到剪贴板');
         } catch (error) {
             new Notice('复制失败');

@@ -51,10 +51,15 @@ export class CreateTemplateModal extends Modal {
                 taskList: "list-style: none; margin-left: -24px; font-size: 1em; color: #4a4a4a; line-height: 1.8;"
             },
             code: {
-                block: "background: #f8f9fc; padding: 0.5em 1em 1em; border-radius: 8px; font-size: 14px; font-family: Operator Mono, Consolas, Monaco, Menlo, monospace; line-height: 1.6; white-space: pre; overflow-x: auto; word-wrap: normal; color: #333; margin: 1.2em 0; border: 1px solid #eef0f7; box-shadow: 0 2px 4px rgba(122,125,160,0.05); width: 100%;",
-                inline: "background: #f8f9fc; padding: 2px 6px; border-radius: 4px; color: #333; font-size: 14px; font-family: Operator Mono, Consolas, Monaco, Menlo, monospace; border: 1px solid #eef0f7;"
+                header: {
+                    container: "position: absolute; top: 8px; left: 8px; display: flex; gap: 6px;",
+                    dot: "width: 12px; height: 12px; border-radius: 50%;",
+                    colors: ["#ff5f56", "#ffbd2e", "#27c93f"]
+                },
+                block: "position: relative; color: #333; background: #f8f9fc; border-radius: 8px; border: 1px solid #eef0f7; box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin: 1.2em 0; padding: 2em 1em 1em;  font-size: 14px; line-height: 1.6; white-space: pre-wrap;",
+                inline: "background: #f8f9fc; padding: 2px 6px; border-radius: 4px; color: #333; font-size: 14px; border: 1px solid #eef0f7;"
             },
-            quote: "border-left: 4px solid #7a7da0; border-radius: 6px; padding: 16px 20px; background: #f8f9fc; margin: 0.8em 0; color: #666b8f; font-style: italic; font-size: 1em; word-wrap: break-word;",
+            quote: "border-left: 4px solid #7a7da0; border-radius: 6px; padding: 10px 10px; background: #f8f9fc; margin: 0.8em 0; color: #666b8f; font-style: italic; word-wrap: break-word;",
             image: "max-width: 100%; height: auto; margin: 1em auto; display: block;",
             link: "color: #7a7da0; text-decoration: none; border-bottom: 1px solid #7a7da0; transition: all 0.2s ease;",
             emphasis: {
@@ -466,7 +471,7 @@ export class CreateTemplateModal extends Modal {
                         });
                 });
 
-                new Setting(content)
+            new Setting(content)
                 .setName('下划线')
                 .setDesc('设置标题下划线是否显示')
                 .addToggle(toggle => {
@@ -476,10 +481,10 @@ export class CreateTemplateModal extends Modal {
                             const fontColor = styles[level].content.match(/color:\s*(#[a-fA-F0-9]+)/)?.[1];
                             const bgColor = styles[level].content.match(/background:\s*(#[a-fA-F0-9]+)/)?.[1];
                             let underlineColor = fontColor !== '#ffffff' ? fontColor : bgColor !== '#ffffff' ? bgColor : '#000000';
-            
+
                             // 将颜色转换为rgba格式
                             const rgbaColor = `rgba(${parseInt(underlineColor.slice(1, 3), 16)}, ${parseInt(underlineColor.slice(3, 5), 16)}, ${parseInt(underlineColor.slice(5, 7), 16)}, 0.2)`;
-            
+
                             if (value) {
                                 styles[level].base += ` border-bottom: 1px solid ${rgbaColor};`;
                             } else {
@@ -662,22 +667,6 @@ export class CreateTemplateModal extends Modal {
         const quoteSection = container.createDiv('quote-section');
 
         new Setting(quoteSection)
-            .setName('引用边框颜色')
-            .setDesc('设置引用块左侧边框的颜色')
-            .addColorPicker(color => {
-                const currentColor = styles.quote.match(/border-left:\s*\d+px\s*solid\s*(#[a-fA-F0-9]+)/)?.[1];
-                color.setValue(currentColor)
-                    .onChange(value => {
-                        styles.quote = styles.quote.replace(/border-left:\s*\d+px\s*solid\s*#[a-fA-F0-9]+/, `border-left: 3px solid ${value}`);
-
-                        // 如果有渐变背景，也更新背景色
-                        if (styles.quote.includes('linear-gradient')) {
-                            styles.quote = styles.quote.replace(/rgba\([^)]+\)/, `rgba(${parseInt(value.slice(1, 3), 16)},${parseInt(value.slice(3, 5), 16)},${parseInt(value.slice(5, 7), 16)},0.1)`);
-                        }
-                    });
-            });
-
-        new Setting(quoteSection)
             .setName('引用文本颜色')
             .setDesc('设置引用块内文本的颜色')
             .addColorPicker(color => {
@@ -687,23 +676,113 @@ export class CreateTemplateModal extends Modal {
                         styles.quote = styles.quote.replace(/color:\s*#[a-fA-F0-9]+/, `color: ${value}`);
                     });
             });
+        new Setting(quoteSection)
+            .setName('文本样式')
+            .setDesc('设置引用块内文本是否斜体、是否加粗')
+            .addToggle(toggle => {
+                const isItalic = styles.quote.includes('font-style: italic');
+                toggle.setValue(isItalic)
+                    .setTooltip('斜体')
+                    .onChange(value => {
+                        if (value) {
+                            if (!styles.quote.includes('font-style:')) {
+                                styles.quote = styles.quote.replace(/;(\s*)$/, `; font-style: italic;$1`);
+                            } else {
+                                styles.quote = styles.quote.replace(/font-style:[^;]+;/, 'font-style: italic;');
+                            }
+                        } else {
+                            styles.quote = styles.quote.replace(/font-style:[^;]+;/, '');
+                        }
+                    });
+            })
+            .addToggle(toggle => {
+                const isBold = styles.quote.includes('font-weight: bold');
+                toggle.setValue(isBold)
+                    .setTooltip('粗体')
+                    .onChange(value => {
+                        if (value) {
+                            if (!styles.quote.includes('font-weight:')) {
+                                styles.quote = styles.quote.replace(/;(\s*)$/, `; font-weight: bold;$1`);
+                            } else {
+                                styles.quote = styles.quote.replace(/font-weight:[^;]+;/, 'font-weight: bold;');
+                            }
+                        } else {
+                            styles.quote = styles.quote.replace(/font-weight:[^;]+;/, '');
+                        }
+                    });
+            });
+        new Setting(quoteSection)
+            .setName('引用背景颜色')
+            .setDesc('设置引用块的背景颜色')
+            .addColorPicker(color => {
+                const currentBg = styles.quote.match(/background:\s*(#[a-fA-F0-9]+)/)?.[1];
+                color.setValue(currentBg || '#f8f9fc')
+                    .onChange(value => {
+                        if (styles.quote.includes('background:')) {
+                            styles.quote = styles.quote.replace(/background:\s*#[a-fA-F0-9]+/, `background: ${value}`);
+                        } else {
+                            styles.quote = styles.quote.replace(/;(\s*)$/, `; background: ${value};$1`);
+                        }
+                    });
+            });
 
         new Setting(quoteSection)
-            .setName('左侧内边距')
-            .setDesc('设置引用块内容与左侧边框之间的距离（单位：像素）')
-            .addText(text => {
-                const currentPadding = styles.quote.match(/padding:\s*0\s*0\s*0\s*(\d+)px/)?.[1];
-                text.setValue(currentPadding)
+            .setName('引用边框')
+            .setDesc('设置引用块左侧边框的颜色和圆角')
+            .addColorPicker(color => {
+                const currentColor = styles.quote.match(/border-left:\s*\d+px\s*solid\s*(#[a-fA-F0-9]+)/)?.[1];
+                color.setValue(currentColor)
                     .onChange(value => {
-                        const padding = parseInt(value) || 20;
-                        styles.quote = styles.quote.replace(/padding:\s*0\s*0\s*0\s*\d+px/, `padding: 0 0 0 ${padding}px`);
+                        styles.quote = styles.quote.replace(/border-left:\s*\d+px\s*solid\s*#[a-fA-F0-9]+/, `border-left: 4px solid ${value}`);
+
+                        // 如果有渐变背景，也更新背景色
+                        if (styles.quote.includes('linear-gradient')) {
+                            styles.quote = styles.quote.replace(/rgba\([^)]+\)/, `rgba(${parseInt(value.slice(1, 3), 16)},${parseInt(value.slice(3, 5), 16)},${parseInt(value.slice(5, 7), 16)},0.1)`);
+                        }
+                    });
+            })
+            .addToggle(toggle => {
+                const hasRadius = styles.quote.includes('border-radius:');
+                toggle.setValue(hasRadius)
+                    .setTooltip('圆角')
+                    .onChange(value => {
+                        if (value) {
+                            if (!styles.quote.includes('border-radius:')) {
+                                styles.quote = styles.quote.replace(/;(\s*)$/, `; border-radius: 6px;$1`);
+                            }
+                        } else {
+                            styles.quote = styles.quote.replace(/border-radius:[^;]+;/, '');
+                        }
+                    });
+            });
+
+        new Setting(quoteSection)
+            .setName('内边距')
+            .setDesc('设置引用块的内边距（单位：像素）')
+            .addText(text => {
+                const currentPadding = styles.quote.match(/padding:\s*(\d+)px\s+(\d+)px/);
+                text.setValue(currentPadding ? currentPadding[1] : '16')
+                    .setPlaceholder('上下内边距')
+                    .onChange(value => {
+                        const vPadding = parseInt(value) || 16;
+                        const hPadding = styles.quote.match(/padding:\s*\d+px\s+(\d+)px/)?.[1] || '20';
+                        styles.quote = styles.quote.replace(/padding:[^;]+;/, `padding: ${vPadding}px ${hPadding}px;`);
+                    });
+            })
+            .addText(text => {
+                const currentPadding = styles.quote.match(/padding:\s*\d+px\s+(\d+)px/);
+                text.setValue(currentPadding ? currentPadding[1] : '20')
+                    .setPlaceholder('左右内边距')
+                    .onChange(value => {
+                        const hPadding = parseInt(value) || 20;
+                        const vPadding = styles.quote.match(/padding:\s*(\d+)px/)?.[1] || '16';
+                        styles.quote = styles.quote.replace(/padding:[^;]+;/, `padding: ${vPadding}px ${hPadding}px;`);
                     });
             });
     }
 
 
     private addCodeSettings(container: HTMLElement, styles: any) {
-        // 代码块设置
         const codeBlockSection = container.createDiv('style-section');
 
         // 创建折叠面板标题区域
@@ -715,7 +794,7 @@ export class CreateTemplateModal extends Modal {
 
         // 创建内容区域
         const codeBlockContent = codeBlockSection.createDiv('style-section-content');
-        codeBlockContent.hide(); // 默认隐藏
+        codeBlockContent.hide();
 
         // 折叠面板点击事件
         codeBlockHeader.addEventListener('click', () => {
@@ -725,6 +804,29 @@ export class CreateTemplateModal extends Modal {
             codeBlockContent.toggle(isExpanded);
         });
 
+        // 指示器颜色设置
+        new Setting(codeBlockContent)
+            .setName('指示器颜色')
+            .setDesc('设置代码块左上角三个点的颜色')
+            .addColorPicker(color => {
+                color.setValue(styles.header.colors[0])
+                    .onChange(value => {
+                        styles.header.colors[0] = value;
+                    });
+            })
+            .addColorPicker(color => {
+                color.setValue(styles.header.colors[1])
+                    .onChange(value => {
+                        styles.header.colors[1] = value;
+                    });
+            })
+            .addColorPicker(color => {
+                color.setValue(styles.header.colors[2])
+                    .onChange(value => {
+                        styles.header.colors[2] = value;
+                    });
+            });
+
         new Setting(codeBlockContent)
             .setName('背景颜色')
             .setDesc('设置代码块的背景颜色')
@@ -733,77 +835,75 @@ export class CreateTemplateModal extends Modal {
                 color.setValue(currentBg)
                     .onChange(value => {
                         styles.block = styles.block.replace(/background:\s*#[a-fA-F0-9]+/, `background: ${value}`);
+                        styles.inline = styles.inline.replace(/background:\s*#[a-fA-F0-9]+/, `background: ${value}`);
+                    });
+            });
+
+        new Setting(codeBlockContent)
+            .setName('边框颜色')
+            .setDesc('设置代码块的边框颜色')
+            .addColorPicker(color => {
+                const currentBorder = styles.block.match(/border:\s*1px\s*solid\s*(#[a-fA-F0-9]+)/)?.[1];
+                color.setValue(currentBorder)
+                    .onChange(value => {
+                        styles.block = styles.block.replace(/border:\s*1px\s*solid\s*#[a-fA-F0-9]+/, `border: 1px solid ${value}`);
+                        styles.inline = styles.inline.replace(/border:\s*1px\s*solid\s*#[a-fA-F0-9]+/, `border: 1px solid ${value}`);
                     });
             });
 
         new Setting(codeBlockContent)
             .setName('文本颜色')
-            .setDesc('设置代码块内文本的颜色')
+            .setDesc('设置代码块的文本颜色')
             .addColorPicker(color => {
                 const currentColor = styles.block.match(/color:\s*(#[a-fA-F0-9]+)/)?.[1];
                 color.setValue(currentColor)
                     .onChange(value => {
                         styles.block = styles.block.replace(/color:\s*#[a-fA-F0-9]+/, `color: ${value}`);
-                    });
-            });
-
-        new Setting(codeBlockContent)
-            .setName('圆角大小')
-            .setDesc('设置代码块的圆角大小（单位：像素）')
-            .addText(text => {
-                const currentRadius = styles.block.match(/border-radius:\s*(\d+)px/)?.[1];
-                text.setValue(currentRadius)
-                    .onChange(value => {
-                        const radius = parseInt(value) || 8;
-                        styles.block = styles.block.replace(/border-radius:\s*\d+px/, `border-radius: ${radius}px`);
-                    });
-            });
-
-        // 行内代码设置
-        const inlineCodeSection = container.createDiv('style-section');
-
-        // 创建折叠面板标题区域
-        const inlineCodeHeader = inlineCodeSection.createDiv('style-section-header');
-        const inlineCodeTitleContainer = inlineCodeHeader.createDiv('style-section-title');
-        const inlineCodeToggle = inlineCodeTitleContainer.createSpan('style-section-toggle');
-        setIcon(inlineCodeToggle, 'chevron-right');
-        inlineCodeTitleContainer.createEl('h4', { text: '行内代码样式' });
-
-        // 创建内容区域
-        const inlineCodeContent = inlineCodeSection.createDiv('style-section-content');
-        inlineCodeContent.hide(); // 默认隐藏
-
-        // 折叠面板点击事件
-        inlineCodeHeader.addEventListener('click', () => {
-            const isExpanded = !inlineCodeSection.hasClass('is-expanded');
-            inlineCodeSection.toggleClass('is-expanded', isExpanded);
-            setIcon(inlineCodeToggle, isExpanded ? 'chevron-down' : 'chevron-right');
-            inlineCodeContent.toggle(isExpanded);
-        });
-
-        new Setting(inlineCodeContent)
-            .setName('背景颜色')
-            .setDesc('设置行内代码的背景颜色')
-            .addColorPicker(color => {
-                const currentBg = styles.inline.match(/background:\s*(#[a-fA-F0-9]+)/)?.[1];
-                color.setValue(currentBg)
-                    .onChange(value => {
-                        styles.inline = styles.inline.replace(/background:\s*#[a-fA-F0-9]+/, `background: ${value}`);
-                    });
-            });
-
-        new Setting(inlineCodeContent)
-            .setName('文本颜色')
-            .setDesc('设置行内代码的文本颜色')
-            .addColorPicker(color => {
-                const currentColor = styles.inline.match(/color:\s*(#[a-fA-F0-9]+)/)?.[1];
-                color.setValue(currentColor)
-                    .onChange(value => {
                         styles.inline = styles.inline.replace(/color:\s*#[a-fA-F0-9]+/, `color: ${value}`);
                     });
             });
+        new Setting(codeBlockContent)
+            .setName('文本样式')
+            .setDesc('设置代码块文本的样式')
+            .addText(text => {
+                const currentSize = styles.block.match(/font-size:\s*(\d+)px/)?.[1];
+                text.setValue(currentSize || '14')
+                    .setPlaceholder('字体大小')
+                    .onChange(value => {
+                        const size = parseInt(value) || 14;
+                        styles.block = styles.block.replace(/font-size:\s*\d+px/, `font-size: ${size}px`);
+                        styles.inline = styles.inline.replace(/font-size:\s*\d+px/, `font-size: ${size}px`);
+                    });
+            })
+            .addToggle(toggle => {
+                const isBold = styles.block.includes('font-weight: bold');
+                toggle.setValue(isBold)
+                    .setTooltip('加粗')
+                    .onChange(value => {
+                        if (value) {
+                            styles.block = styles.block.replace(/;(\s*)$/, `; font-weight: bold;$1`);
+                            styles.inline = styles.inline.replace(/;(\s*)$/, `; font-weight: bold;$1`);
+                        } else {
+                            styles.block = styles.block.replace(/font-weight:\s*bold;\s*/, '');
+                            styles.inline = styles.inline.replace(/font-weight:\s*bold;\s*/, '');
+                        }
+                    });
+            })
+            .addToggle(toggle => {
+                const isItalic = styles.block.includes('font-style: italic');
+                toggle.setValue(isItalic)
+                    .setTooltip('倾斜')
+                    .onChange(value => {
+                        if (value) {
+                            styles.block = styles.block.replace(/;(\s*)$/, `; font-style: italic;$1`);
+                            styles.inline = styles.inline.replace(/;(\s*)$/, `; font-style: italic;$1`);
+                        } else {
+                            styles.block = styles.block.replace(/font-style:\s*italic;\s*/, '');
+                            styles.inline = styles.inline.replace(/font-style:\s*italic;\s*/, '');
+                        }
+                    });
+            });
     }
-
 
 
     private addLinkSettings(container: HTMLElement, styles: any) {
@@ -1012,10 +1112,14 @@ export class CreateTemplateModal extends Modal {
             .setDesc('设置图片的圆角程度（单位：像素）')
             .addText(text => {
                 const currentRadius = styles.image.match(/border-radius:\s*(\d+)px/)?.[1];
-                text.setValue(currentRadius)
+                text.setValue(currentRadius || '8')
                     .onChange(value => {
                         const radius = parseInt(value) || 8;
-                        styles.image = styles.image.replace(/border-radius:\s*\d+px/, `border-radius: ${radius}px`);
+                        if (styles.image.includes('border-radius:')) {
+                            styles.image = styles.image.replace(/border-radius:\s*\d+px/, `border-radius: ${radius}px`);
+                        } else {
+                            styles.image = styles.image.replace(/;(\s*)$/, `; border-radius: ${radius}px;$1`);
+                        }
                     });
             });
 
@@ -1024,9 +1128,13 @@ export class CreateTemplateModal extends Modal {
             .setDesc('设置图片边框的颜色')
             .addColorPicker(color => {
                 const currentColor = styles.image.match(/border:\s*1px solid\s*(#[a-fA-F0-9]+)/)?.[1];
-                color.setValue(currentColor)
+                color.setValue(currentColor || '#d1d5db')
                     .onChange(value => {
-                        styles.image = styles.image.replace(/border:\s*1px solid\s*#[a-fA-F0-9]+80/, `border: 1px solid ${value}80`);
+                        if (styles.image.includes('border:')) {
+                            styles.image = styles.image.replace(/border:\s*1px solid\s*#[a-fA-F0-9]+80/, `border: 1px solid ${value}80`);
+                        } else {
+                            styles.image = styles.image.replace(/;(\s*)$/, `; border: 1px solid ${value}80;$1`);
+                        }
                     });
             });
     }

@@ -34,18 +34,17 @@ export class MPConverter {
             const pre = el.parentElement;
             if (pre) {
                 // 添加 macOS 风格的窗口按钮
-                const dots = document.createElement('div');
-                dots.className = 'mp-code-dots';
+                const header = document.createElement('div');
+                header.className = 'mp-code-header';
 
-                const colors = ['#ff5f56', '#ffbd2e', '#27c93f'];
-                colors.forEach(color => {
+                // 添加三个窗口按钮
+                for (let i = 0; i < 3; i++) {
                     const dot = document.createElement('span');
                     dot.className = 'mp-code-dot';
-                    dot.style.backgroundColor = color;  // 这个样式保留，因为是动态的
-                    dots.appendChild(dot);
-                });
+                    header.appendChild(dot);
+                }
 
-                pre.insertBefore(dots, pre.firstChild);
+                pre.insertBefore(header, pre.firstChild);
                 
                 // 移除原有的复制按钮
                 const copyButton = pre.querySelector('.copy-code-button');
