@@ -2,29 +2,29 @@ import { Notice } from 'obsidian';
 
 export class CopyManager {
     private static cleanupHtml(element: HTMLElement): string {
+        // 创建克隆以避免修改原始元素
         const clone = element.cloneNode(true) as HTMLElement;
-        
-        // 使用 DOM API 移除属性
-        clone.querySelectorAll('*').forEach(el => {
-            // 移除所有非样式属性
-            Array.from(el.attributes)
-                .filter(attr => !attr.name.startsWith('style'))
-                .forEach(attr => el.removeAttribute(attr.name));
-                
-            // 检查并清理 style 属性中的潜在危险内容
-            if (el.hasAttribute('style')) {
-                const style = el.getAttribute('style');
-                if (style?.includes('javascript:') || style?.includes('expression(')) {
-                    el.removeAttribute('style');
-                }
-            }
 
-            // 移除可能包含脚本的元素
-            if (el.tagName.toLowerCase() === 'script' || el.tagName.toLowerCase() === 'iframe') {
-                el.remove();
-            }
+        // 移除所有的 data-* 属性
+        clone.querySelectorAll('*').forEach(el => {
+            Array.from(el.attributes).forEach(attr => {
+                if (attr.name.startsWith('data-')) {
+                    el.removeAttribute(attr.name);
+                }
+            });
         });
 
+        // 移除所有的 class 属性
+        clone.querySelectorAll('*').forEach(el => {
+            el.removeAttribute('class');
+        });
+
+        // 移除所有的 id 属性
+        clone.querySelectorAll('*').forEach(el => {
+            el.removeAttribute('id');
+        });
+
+        // 使用 XMLSerializer 安全地转换为字符串
         const serializer = new XMLSerializer();
         return serializer.serializeToString(clone);
     }
@@ -59,7 +59,7 @@ export class CopyManager {
 
             // 使用新的 cleanupHtml 方法
             const cleanHtml = this.cleanupHtml(clone);
-            
+
             const clipData = new ClipboardItem({
                 'text/html': new Blob([cleanHtml], { type: 'text/html' }),
                 'text/plain': new Blob([clone.textContent || ''], { type: 'text/plain' })
