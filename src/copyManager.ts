@@ -57,8 +57,12 @@ export class CopyManager {
             const clone = element.cloneNode(true) as HTMLElement;
             await this.processImages(clone);
 
+            const contentSection = clone.querySelector('.mp-content-section');
+            if (!contentSection) {
+                throw new Error('找不到内容区域');
+            }
             // 使用新的 cleanupHtml 方法
-            const cleanHtml = this.cleanupHtml(clone);
+            const cleanHtml = this.cleanupHtml(contentSection as HTMLElement);
 
             const clipData = new ClipboardItem({
                 'text/html': new Blob([cleanHtml], { type: 'text/html' }),

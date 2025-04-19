@@ -50,7 +50,7 @@ export class CreateTemplateModal extends Modal {
                     after: ""
                 }
             },
-            paragraph: "line-height: 1.8; margin-bottom: 1.2em; font-size: 1em; color: #4a4a4a;",
+            paragraph: "line-height: 1.8; margin: 1.2em 0; font-size: 1em; color: #4a4a4a;",
             list: {
                 container: "padding-left: 32px; margin-bottom: 1.2em; color: #4a4a4a;",
                 item: "margin-bottom: 0.6em; font-size: 1em; color: #4a4a4a; line-height: 1.8;",
@@ -576,27 +576,26 @@ export class CreateTemplateModal extends Modal {
                     });
             });
 
-        new Setting(content)
+            new Setting(content)
             .setName('下边距')
             .setDesc('设置段落与下方内容之间的间距（单位：em）')
             .addText(text => {
-                const currentMargin = styles.paragraph.match(/margin-bottom:\s*([\d.]+)em/)?.[1];
+                // 兼容 margin: 1.2em 0; 或 margin: 1.2em; 或没有 margin 的情况
+                const marginMatch = styles.paragraph.match(/margin:\s*([\d.]+)em(?:\s+0)?/);
+                const currentMargin = marginMatch ? marginMatch[1] : '';
                 text.setValue(currentMargin)
                     .onChange(value => {
-                        const margin = parseFloat(value) || 1.1;
-                        styles.paragraph = styles.paragraph.replace(/margin-bottom:\s*[\d.]+em/, `margin-bottom: ${margin}em`);
-                    });
-            });
-
-        new Setting(content)
-            .setName('字体大小')
-            .setDesc('设置段落文本的字体大小（单位：像素）')
-            .addText(text => {
-                const currentSize = styles.paragraph.match(/font-size:\s*(\d+)px/)?.[1];
-                text.setValue(currentSize)
-                    .onChange(value => {
-                        const size = parseInt(value) || 15;
-                        styles.paragraph = styles.paragraph.replace(/font-size:\s*\d+px/, `font-size: ${size}px`);
+                        const margin = parseFloat(value) || 1.2;
+                        if (styles.paragraph.match(/margin:\s*[\d.]+em\s*0/)) {
+                            // margin: 1.2em 0; 只替换第一个值
+                            styles.paragraph = styles.paragraph.replace(/margin:\s*[\d.]+em\s*0/, `margin: ${margin}em 0`);
+                        } else if (styles.paragraph.match(/margin:\s*[\d.]+em/)) {
+                            // margin: 1.2em; 替换为 margin: 1.2em 0;
+                            styles.paragraph = styles.paragraph.replace(/margin:\s*[\d.]+em/, `margin: ${margin}em 0`);
+                        } else {
+                            // 没有 margin，直接加上
+                            styles.paragraph += ` margin: ${margin}em 0;`;
+                        }
                     });
             });
 

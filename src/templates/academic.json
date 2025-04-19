@@ -25,7 +25,7 @@
                 "after": ""
             }
         },
-        "paragraph": "line-height: 1.8; margin-bottom: 1.2em; font-size: 1em; color: #4a4a4a;",
+        "paragraph": "line-height: 1.8; margin: 1.2em 0; font-size: 1em; color: #4a4a4a;",
         "link": "color: #795548; text-decoration: none; border-bottom: 1px solid #8D6E63; transition: all 0.2s ease;",
         "emphasis": {
             "strong": "font-weight: 600; color: #4a4a4a;",
