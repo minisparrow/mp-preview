@@ -98,8 +98,8 @@ export class TemplateManager {
         this.currentFontSize = size;
     }
 
-    public applyTemplate(element: HTMLElement): void {
-        const styles = this.currentTemplate.styles;
+    public applyTemplate(element: HTMLElement, template?: Template): void {
+        const styles = template ? template.styles : this.currentTemplate.styles;
         // 应用标题样式
         ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'].forEach(tag => {
             element.querySelectorAll(tag).forEach(el => {

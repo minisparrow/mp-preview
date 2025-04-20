@@ -1,6 +1,7 @@
 import { App, Modal, Setting, Notice, setIcon, ColorComponent } from 'obsidian';
 import MPPlugin from '../main';
 import { Template } from '../templateManager';
+import { TemplatePreviewModal } from './templatePreviewModal';
 
 export class CreateTemplateModal extends Modal {
     private template: Template;
@@ -181,16 +182,23 @@ export class CreateTemplateModal extends Modal {
         const buttonContainer = contentEl.createDiv('modal-button-container');
         new Setting(buttonContainer)
             .addButton(btn => btn
+                .setButtonText('预览')
+                .onClick(() => {
+                    // 打开预览模式
+                    const previewModal = new TemplatePreviewModal(this.app, this.template, this.plugin.templateManager);
+                    previewModal.open();
+                }))
+            .addButton(btn => btn
+                .setButtonText('取消')
+                .onClick(() => this.close()))
+            .addButton(btn => btn
                 .setButtonText('保存')
                 .setCta()
                 .onClick(async () => {
                     if (await this.validateAndSubmit()) {
                         this.close();
                     }
-                }))
-            .addButton(btn => btn
-                .setButtonText('取消')
-                .onClick(() => this.close()));
+                }));
 
         this.nameInput.addEventListener('keydown', async (e) => {
             if (e.key === 'Enter' && !e.shiftKey) {

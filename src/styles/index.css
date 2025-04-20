@@ -3,3 +3,5 @@
 @import url('./settings/settings.css');
 @import url('./settings/font-modal.css');
 @import url('./settings/template-modal.css');
+@import url('./settings/template-preview-modal.css');
+@import url('./settings/background-modal.css');

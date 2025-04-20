@@ -30,7 +30,7 @@ export class MPView extends ItemView {
         super(leaf);
         this.templateManager = templateManager;
         this.settingsManager = settingsManager;
-        this.backgroundManager = new BackgroundManager();
+        this.backgroundManager = new BackgroundManager(this.settingsManager);
     }
 
     getViewType() {
@@ -68,7 +68,7 @@ export class MPView extends ItemView {
         // 添加背景选择器
         const backgroundOptions = [
             { value: '', label: '无背景' },
-            ...(this.backgroundManager.getAllBackgrounds()?.map(bg => ({
+            ...(this.settingsManager.getVisibleBackgrounds()?.map(bg => ({
                 value: bg.id,
                 label: bg.name
             })) || [])
