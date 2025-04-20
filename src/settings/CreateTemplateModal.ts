@@ -435,11 +435,21 @@ export class CreateTemplateModal extends Modal {
                 .setName('字体大小')
                 .setDesc('设置标题的字体大小（单位：像素）')
                 .addText(text => {
-                    const currentSize = styles[level].base.match(/font-size:\s*(\d+)px/)?.[1];
+                    // 兼容 px 和 em 两种单位的字体大小
+                    const fontSizeMatch = styles[level].base.match(/font-size:\s*(\d+(?:\.\d+)?)(px|em)/);
+                    let currentSize = '';
+
+                    if (fontSizeMatch) {
+                        const [, size, unit] = fontSizeMatch;
+                        // 如果是 em 单位，转换为 px (假设基础字体大小为 16px)
+                        currentSize = unit === 'em' ? String(parseFloat(size) * 16) : size;
+                    }
+
                     text.setValue(currentSize)
                         .onChange(value => {
                             const size = parseInt(value) || 16;
-                            styles[level].base = styles[level].base.replace(/font-size:\s*\d+px/, `font-size: ${size}px`);
+                            // 替换任意单位的 font-size
+                            styles[level].base = styles[level].base.replace(/font-size:\s*\d+(?:\.\d+)?(?:px|em)/, `font-size: ${size}px`);
                         });
                 });
             new Setting(content)
@@ -576,7 +586,7 @@ export class CreateTemplateModal extends Modal {
                     });
             });
 
-            new Setting(content)
+        new Setting(content)
             .setName('下边距')
             .setDesc('设置段落与下方内容之间的间距（单位：em）')
             .addText(text => {
