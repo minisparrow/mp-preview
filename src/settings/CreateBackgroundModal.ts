@@ -13,41 +13,109 @@ export class CreateBackgroundModal extends Modal {
     private background: Background;
     private isEditing: boolean;
 
-    // 内部使用的背景类型
+    // 背景属性
     private backgroundType: 'color' | 'css' = 'color';
     private backgroundColor: string = '#f5f5f5';
     private backgroundCssStyle: string = '';
-    private cssTemplateType: string = 'custom'; // 新增：CSS模板类型
-    // 新增属性
+    private cssTemplateType: string = 'custom';
     private patternColor: string = 'rgba(50, 0, 0, 0.03)';
     private patternSize: number = 20;
 
-    // 根据模板类型更新设置项的可见性
-    private updateSettingsVisibility(cssSection: HTMLElement, templateType: string) {
-        const template = this.cssTemplates[templateType];
-        if (!template) return;
-
-        // 获取所有可能的设置项容器
-        const colorSettingContainer = cssSection.querySelector('.pattern-color-setting');
-        const sizeSettingContainer = cssSection.querySelector('.pattern-size-setting');
-        const customCssContainer = cssSection.querySelector('.custom-css-container');
-
-        // 根据模板需要的设置项显示或隐藏
-        if (colorSettingContainer) {
-            colorSettingContainer.toggleClass('is-hidden', !template.settings.includes('color'));
+    // 预设的CSS模板
+    private cssTemplates: Record<string, CssTemplate> = {
+        custom: {
+            name: '自定义',
+            style: '',
+            settings: ['custom']
+        },
+        grid: {
+            name: '网格',
+            style: 'background-image: linear-gradient(90deg, rgba(50, 0, 0, 0.03) 2%, transparent 2%), linear-gradient(360deg, rgba(50, 0, 0, 0.03) 2%, transparent 2%); background-size: 20px 20px;',
+            settings: ['color', 'size']
+        },
+        diagonalStripes: {
+            name: '对角条纹',
+            style: 'background-image: linear-gradient(135deg, rgba(50, 0, 0, 0.05) 25%, transparent 25%, transparent 50%, rgba(50, 0, 0, 0.05) 50%, rgba(50, 0, 0, 0.05) 75%, transparent 75%, transparent); background-size: 20px 20px;',
+            settings: ['color', 'size']
+        },
+        polkaDots: {
+            name: '波尔卡圆点',
+            style: 'background-image: radial-gradient(circle, rgba(50, 0, 0, 0.05) 10%, transparent 10%); background-size: 20px 20px;',
+            settings: ['color', 'size']
+        },
+        zigzag: {
+            name: '锯齿形',
+            style: 'background-image: linear-gradient(135deg, rgba(50, 0, 0, 0.05) 25%, transparent 25%, transparent 50%, rgba(50, 0, 0, 0.05) 50%, rgba(50, 0, 0, 0.05) 75%, transparent 75%, transparent); background-size: 20px 20px; background-position: 0 0, 10px 10px;',
+            settings: ['color', 'size']
+        },
+        honeycomb: {
+            name: '蜂窝',
+            style: 'background-image: linear-gradient(30deg, rgba(50, 0, 0, 0.05) 12%, transparent 12%, transparent 50%, rgba(50, 0, 0, 0.05) 50%, rgba(50, 0, 0, 0.05) 62%, transparent 62%, transparent); background-size: 20px 35px;',
+            settings: ['color', 'size']
+        },
+        wave: {
+            name: '波浪',
+            style: 'background-image: linear-gradient(45deg, rgba(50, 0, 0, 0.04) 12%, transparent 12%, transparent 88%, rgba(50, 0, 0, 0.04) 88%), linear-gradient(135deg, rgba(50, 0, 0, 0.04) 12%, transparent 12%, transparent 88%, rgba(50, 0, 0, 0.04) 88%); background-size: 30px 30px; background-position: 0 0, 0 0, 15px 15px, 15px 15px;',
+            settings: ['color', 'size']
+        },
+        checkerboard: {
+            name: '棋盘',
+            style: 'background-image: linear-gradient(45deg, rgba(50, 0, 0, 0.04) 25%, transparent 25%), linear-gradient(-45deg, rgba(50, 0, 0, 0.04) 25%, transparent 25%), linear-gradient(45deg, transparent 75%, rgba(50, 0, 0, 0.04) 75%), linear-gradient(-45deg, transparent 75%, rgba(50, 0, 0, 0.04) 75%); background-size: 20px 20px; background-position: 0 0, 0 10px, 10px -10px, -10px 0px;',
+            settings: ['color', 'size']
         }
+    };
 
-        if (sizeSettingContainer) {
-            sizeSettingContainer.toggleClass('is-hidden', !template.settings.includes('size'));
+    constructor(
+        app: App,
+        onSubmit: (background: Background) => void,
+        background?: Background
+    ) {
+        super(app);
+        this.onSubmit = onSubmit;
+        this.isEditing = !!background;
+
+        if (background) {
+            this.background = { ...background };
+            // 从 style 中解析出类型和相关属性
+            this.parseStyleToProperties(background.style);
+        } else {
+            this.background = {
+                id: nanoid(),
+                name: '',
+                style: 'background-color: #f5f5f5;'
+            };
+            this.backgroundType = 'color';
+            this.backgroundColor = '#f5f5f5';
         }
+    }
 
-        if (customCssContainer) {
-            customCssContainer.toggleClass('is-hidden', !template.settings.includes('custom'));
+    // 从 style 字符串中解析出背景类型和相关属性
+    private parseStyleToProperties(style: string) {
+        if (style.includes('background-color:')) {
+            this.backgroundType = 'color';
+            const colorMatch = style.match(/background-color: (#[a-fA-F0-9]+)/);
+            if (colorMatch && colorMatch[1]) {
+                this.backgroundColor = colorMatch[1];
+            }
+        } else {
+            this.backgroundType = 'css';
+            // 移除基本样式，保留自定义 CSS
+            this.backgroundCssStyle = style.replace(/box-sizing: border-box; margin: 0; padding: 0;/, '').trim();
 
-            // 如果显示自定义CSS，同时显示文本区域
-            const customCssTextArea = cssSection.querySelector('.custom-css-textarea');
-            if (customCssTextArea && template.settings.includes('custom')) {
-                customCssTextArea.toggleClass('is-hidden', false);
+            // 尝试匹配预设模板
+            let matched = false;
+            for (const [key, template] of Object.entries(this.cssTemplates)) {
+                if (key === 'custom') continue;
+
+                if (this.backgroundCssStyle === template.style) {
+                    this.cssTemplateType = key;
+                    matched = true;
+                    break;
+                }
+            }
+
+            if (!matched) {
+                this.cssTemplateType = 'custom';
             }
         }
     }
@@ -118,105 +186,118 @@ export class CreateBackgroundModal extends Modal {
 
         this.backgroundCssStyle = style;
     }
-    // 预设的CSS模板
-    private cssTemplates: Record<string, CssTemplate> = {
-        custom: {
-            name: '自定义',
-            style: '',
-            settings: ['custom']
-        },
-        grid: {
-            name: '网格',
-            style: 'background-image: linear-gradient(90deg, rgba(50, 0, 0, 0.03) 2%, transparent 2%), linear-gradient(360deg, rgba(50, 0, 0, 0.03) 2%, transparent 2%); background-size: 20px 20px;',
-            settings: ['color', 'size']
-        },
-        diagonalStripes: {
-            name: '对角条纹',
-            style: 'background-image: linear-gradient(135deg, rgba(50, 0, 0, 0.05) 25%, transparent 25%, transparent 50%, rgba(50, 0, 0, 0.05) 50%, rgba(50, 0, 0, 0.05) 75%, transparent 75%, transparent); background-size: 20px 20px;',
-            settings: ['color', 'size']
-        },
-        polkaDots: {
-            name: '波尔卡圆点',
-            style: 'background-image: radial-gradient(circle, rgba(50, 0, 0, 0.05) 10%, transparent 10%); background-size: 20px 20px;',
-            settings: ['color', 'size']
-        },
-        zigzag: {
-            name: '锯齿形',
-            style: 'background-image: linear-gradient(135deg, rgba(50, 0, 0, 0.05) 25%, transparent 25%, transparent 50%, rgba(50, 0, 0, 0.05) 50%, rgba(50, 0, 0, 0.05) 75%, transparent 75%, transparent); background-size: 20px 20px; background-position: 0 0, 10px 10px;',
-            settings: ['color', 'size']
-        },
-        honeycomb: {
-            name: '蜂窝',
-            style: 'background-image: linear-gradient(30deg, rgba(50, 0, 0, 0.05) 12%, transparent 12%, transparent 50%, rgba(50, 0, 0, 0.05) 50%, rgba(50, 0, 0, 0.05) 62%, transparent 62%, transparent); background-size: 20px 35px;',
-            settings: ['color', 'size']
-        },
-        wave: {
-            name: '波浪',
-            style: 'background-image: linear-gradient(45deg, rgba(50, 0, 0, 0.04) 12%, transparent 12%, transparent 88%, rgba(50, 0, 0, 0.04) 88%), linear-gradient(135deg, rgba(50, 0, 0, 0.04) 12%, transparent 12%, transparent 88%, rgba(50, 0, 0, 0.04) 88%); background-size: 30px 30px; background-position: 0 0, 0 0, 15px 15px, 15px 15px;',
-            settings: ['color', 'size']
-        },
-        checkerboard: {
-            name: '棋盘',
-            style: 'background-image: linear-gradient(45deg, rgba(50, 0, 0, 0.04) 25%, transparent 25%), linear-gradient(-45deg, rgba(50, 0, 0, 0.04) 25%, transparent 25%), linear-gradient(45deg, transparent 75%, rgba(50, 0, 0, 0.04) 75%), linear-gradient(-45deg, transparent 75%, rgba(50, 0, 0, 0.04) 75%); background-size: 20px 20px; background-position: 0 0, 0 10px, 10px -10px, -10px 0px;',
-            settings: ['color', 'size']
+
+    // 根据模板类型更新设置项的可见性
+    private updateSettingsVisibility(cssSection: HTMLElement, templateType: string) {
+        const template = this.cssTemplates[templateType];
+        if (!template) return;
+
+        // 获取所有可能的设置项容器
+        const colorSettingContainer = cssSection.querySelector('.pattern-color-setting');
+        const sizeSettingContainer = cssSection.querySelector('.pattern-size-setting');
+        const customCssContainer = cssSection.querySelector('.custom-css-container');
+
+        // 根据模板需要的设置项显示或隐藏
+        if (colorSettingContainer) {
+            colorSettingContainer.toggleClass('is-hidden', !template.settings.includes('color'));
         }
-    };
 
-    // 从 style 字符串中解析出背景类型和相关属性
-    private parseStyleToProperties(style: string) {
-        if (style.includes('background-color:')) {
-            this.backgroundType = 'color';
-            const colorMatch = style.match(/background-color: (#[a-fA-F0-9]+)/);
-            if (colorMatch && colorMatch[1]) {
-                this.backgroundColor = colorMatch[1];
+        if (sizeSettingContainer) {
+            sizeSettingContainer.toggleClass('is-hidden', !template.settings.includes('size'));
+        }
+
+        if (customCssContainer) {
+            customCssContainer.toggleClass('is-hidden', !template.settings.includes('custom'));
+
+            // 如果显示自定义CSS，同时显示文本区域
+            const customCssTextArea = cssSection.querySelector('.custom-css-textarea');
+            if (customCssTextArea && template.settings.includes('custom')) {
+                customCssTextArea.toggleClass('is-hidden', false);
             }
-        } else {
-            this.backgroundType = 'css';
-            // 移除基本样式，保留自定义 CSS
-            this.backgroundCssStyle = style.replace(/box-sizing: border-box; margin: 0; padding: 0;/, '').trim();
+        }
+    }
 
-            // 尝试匹配预设模板
-            let matched = false;
-            for (const [key, template] of Object.entries(this.cssTemplates)) {
-                if (key === 'custom') continue;
+    // 更新类型特定设置的可见性
+    private updateTypeSpecificSettings() {
+        const colorSection = this.contentEl.querySelector('.background-color-section');
+        const cssSection = this.contentEl.querySelector('.background-css-section');
 
-                if (this.backgroundCssStyle === template.style) {
-                    this.cssTemplateType = key;
-                    matched = true;
-                    break;
+        if (colorSection && cssSection) {
+            colorSection.toggleClass('is-hidden', this.backgroundType !== 'color');
+            cssSection.toggleClass('is-hidden', this.backgroundType !== 'css');
+
+            // 如果切换到CSS背景类型，根据当前模板更新设置项可见性
+            if (this.backgroundType === 'css') {
+                this.updateSettingsVisibility(cssSection as HTMLElement, this.cssTemplateType);
+            }
+        }
+
+        const previewEl = this.contentEl.querySelector('.background-preview');
+        if (previewEl) {
+            this.updatePreview(previewEl as HTMLElement);
+        }
+    }
+
+    // 更新预览区域
+    private updatePreview(previewEl?: HTMLElement) {
+        const el = previewEl || this.contentEl.querySelector('.background-preview');
+        if (!el) return;
+
+        let style = '';
+        switch (this.backgroundType) {
+            case 'color':
+                style = `background-color: ${this.backgroundColor};`;
+                break;
+            case 'css':
+                style = this.backgroundCssStyle;
+                break;
+        }
+
+        el.setAttribute('style', style);
+    }
+
+    // 生成最终样式
+    private generateStyle() {
+        let style = 'box-sizing: border-box; margin: 0; padding: 0; ';
+
+        switch (this.backgroundType) {
+            case 'color':
+                style += `background-color: ${this.backgroundColor};`;
+                break;
+            case 'css':
+                style += this.backgroundCssStyle;
+                break;
+        }
+
+        this.background.style = style;
+    }
+
+    // 表单验证
+    private validateForm(): boolean {
+        if (!this.background.name) {
+            new Notice('请输入背景名称');
+            return false;
+        }
+
+        switch (this.backgroundType) {
+            case 'color':
+                if (!this.backgroundColor) {
+                    new Notice('请选择背景颜色');
+                    return false;
                 }
-            }
-
-            if (!matched) {
-                this.cssTemplateType = 'custom';
-            }
+                break;
+            case 'css':
+                if (!this.backgroundCssStyle) {
+                    new Notice('请输入CSS样式');
+                    return false;
+                }
+                break;
         }
+
+        return true;
     }
 
-    constructor(
-        app: App,
-        onSubmit: (background: Background) => void,
-        background?: Background
-    ) {
-        super(app);
-        this.onSubmit = onSubmit;
-        this.isEditing = !!background;
-
-        if (background) {
-            this.background = { ...background };
-            // 从 style 中解析出类型和相关属性
-            this.parseStyleToProperties(background.style);
-        } else {
-            this.background = {
-                id: nanoid(),
-                name: '',
-                style: 'background-color: #f5f5f5;'
-            };
-            this.backgroundType = 'color';
-            this.backgroundColor = '#f5f5f5';
-        }
-    }
-
+    // 打开模态框时的处理
     onOpen() {
         const { contentEl } = this;
         contentEl.empty();
@@ -337,7 +418,7 @@ export class CreateBackgroundModal extends Modal {
                             customCssTextArea.toggleClass('is-hidden', !isCustom);
                         }
 
-                        // 更新CSS设置项的可见性 - 移动到这里更合适
+                        // 更新CSS设置项的可见性
                         this.updateSettingsVisibility(cssSection, value);
 
                         this.updatePreview();
@@ -405,7 +486,7 @@ export class CreateBackgroundModal extends Modal {
                     });
             });
 
-        // 移除自定义CSS切换按钮，直接创建文本区域容器
+        // 自定义CSS容器
         const customCssContainer = cssSection.createDiv('custom-css-container');
         const customCssTextArea = customCssContainer.createDiv('custom-css-textarea');
         customCssTextArea.toggleClass('is-hidden', this.cssTemplateType !== 'custom');
@@ -415,19 +496,6 @@ export class CreateBackgroundModal extends Modal {
             .setDesc('直接输入CSS样式代码')
             .addTextArea(text => {
                 text.setValue(this.backgroundCssStyle)
-                    .setPlaceholder(`/* CSS背景样式示例 */
-/* 渐变背景 */
-background: linear-gradient(45deg, #ff9a9e 0%, #fad0c4 99%, #fad0c4 100%);
-
-/* 条纹背景 */
-background-image: linear-gradient(90deg, rgba(50, 0, 0, 0.05) 50%, transparent 50%);
-background-size: 10px 10px;
-
-/* 网格背景 */
-background-image: 
-  linear-gradient(rgba(0, 0, 0, 0.1) 1px, transparent 1px),
-  linear-gradient(90deg, rgba(0, 0, 0, 0.1) 1px, transparent 1px);
-background-size: 20px 20px;`)
                     .onChange(value => {
                         this.backgroundCssStyle = value;
                         this.updatePreview();
@@ -435,6 +503,7 @@ background-size: 20px 20px;`)
                 text.inputEl.rows = 10;
                 text.inputEl.cols = 50;
             });
+
         // 背景预览
         const previewSection = contentEl.createDiv('background-preview-section');
         previewSection.createEl('h3', { text: '预览' });
@@ -468,82 +537,7 @@ background-size: 20px 20px;`)
         this.updateTypeSpecificSettings();
     }
 
-    private validateForm(): boolean {
-        if (!this.background.name) {
-            new Notice('请输入背景名称');
-            return false;
-        }
-
-        switch (this.backgroundType) {
-            case 'color':
-                if (!this.backgroundColor) {
-                    new Notice('请选择背景颜色');
-                    return false;
-                }
-                break;
-            case 'css':
-                if (!this.backgroundCssStyle) {
-                    new Notice('请输入CSS样式');
-                    return false;
-                }
-                break;
-        }
-
-        return true;
-    }
-
-    private updateTypeSpecificSettings() {
-        const colorSection = this.contentEl.querySelector('.background-color-section');
-        const cssSection = this.contentEl.querySelector('.background-css-section');
-
-        if (colorSection && cssSection) {
-            colorSection.toggleClass('is-hidden', this.backgroundType !== 'color');
-            cssSection.toggleClass('is-hidden', this.backgroundType !== 'css');
-
-            // 如果切换到CSS背景类型，根据当前模板更新设置项可见性
-            if (this.backgroundType === 'css') {
-                this.updateSettingsVisibility(cssSection as HTMLElement, this.cssTemplateType);
-            }
-        }
-
-        const previewEl = this.contentEl.querySelector('.background-preview');
-        if (previewEl) {
-            this.updatePreview(previewEl as HTMLElement);
-        }
-    }
-
-    private updatePreview(previewEl?: HTMLElement) {
-        const el = previewEl || this.contentEl.querySelector('.background-preview');
-        if (!el) return;
-
-        let style = '';
-        switch (this.backgroundType) {
-            case 'color':
-                style = `background-color: ${this.backgroundColor};`;
-                break;
-            case 'css':
-                style = this.backgroundCssStyle;
-                break;
-        }
-
-        el.setAttribute('style', style);
-    }
-
-    private generateStyle() {
-        let style = 'box-sizing: border-box; margin: 0; padding: 0; ';
-
-        switch (this.backgroundType) {
-            case 'color':
-                style += `background-color: ${this.backgroundColor};`;
-                break;
-            case 'css':
-                style += this.backgroundCssStyle;
-                break;
-        }
-
-        this.background.style = style;
-    }
-
+    // 关闭模态框时的处理
     onClose() {
         const { contentEl } = this;
         contentEl.empty();
