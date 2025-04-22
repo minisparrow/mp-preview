@@ -1,4 +1,4 @@
-import { ItemView, WorkspaceLeaf, MarkdownRenderer, TFile } from 'obsidian';
+import { ItemView, WorkspaceLeaf, MarkdownRenderer, TFile, setIcon } from 'obsidian';
 import { MPConverter } from './converter';
 import { CopyManager } from './copyManager';
 import type { TemplateManager } from './templateManager';
@@ -58,9 +58,10 @@ export class MPView extends ItemView {
         // 锁定按钮
         this.lockButton = controlsGroup.createEl('button', {
             cls: 'mp-lock-button',
-            text: '🔓',
             attr: { 'aria-label': '关闭实时预览状态' }
         });
+        setIcon(this.lockButton, 'lock');
+        this.lockButton.setAttribute('aria-label', '开启实时预览状态');
         this.lockButton.addEventListener('click', () => this.togglePreviewLock());
     
 
@@ -254,10 +255,9 @@ export class MPView extends ItemView {
         // 帮助按钮
         const helpButton = bottomControlsGroup.createEl('button', {
             cls: 'mp-help-button',
-            text: '❓',
             attr: { 'aria-label': '使用指南' }
         });
-        
+        setIcon(helpButton, 'help');
         // 帮助提示框
         bottomControlsGroup.createEl('div', {
             cls: 'mp-help-tooltip',
@@ -374,15 +374,15 @@ export class MPView extends ItemView {
 
         this.updateControlsState(true);
         this.isPreviewLocked = false;
-        this.lockButton.setText('🔓');
+        setIcon(this.lockButton, 'unlock');
         await this.updatePreview();
     }
 
     private async togglePreviewLock() {
         this.isPreviewLocked = !this.isPreviewLocked;
-        const lockIcon = this.isPreviewLocked ? '🔒' : '🔓';
+        const lockIcon = this.isPreviewLocked ? 'lock' : 'unlock';
         const lockStatus = this.isPreviewLocked ? '开启实时预览状态' : '关闭实时预览状态';
-        this.lockButton.setText(lockIcon);
+        setIcon(this.lockButton, lockIcon);
         this.lockButton.setAttribute('aria-label', lockStatus);
         
         if (!this.isPreviewLocked) {
