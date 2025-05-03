@@ -17,32 +17,12 @@ export class MPSettingTab extends PluginSettingTab {
     private createSection(containerEl: HTMLElement, title: string, renderContent: (contentEl: HTMLElement) => void) {
         const section = containerEl.createDiv('settings-section');
         const header = section.createDiv('settings-section-header');
-
-        const toggle = header.createSpan('settings-section-toggle');
-        setIcon(toggle, 'chevron-right');
-
-        header.createEl('h4', { text: title });
-
+    
+        new Setting(header).setName(title).setHeading();
+    
         const content = section.createDiv('settings-section-content');
         renderContent(content);
-
-        header.addEventListener('click', () => {
-            const isExpanded = !section.hasClass('is-expanded');
-            section.toggleClass('is-expanded', isExpanded);
-            setIcon(toggle, isExpanded ? 'chevron-down' : 'chevron-right');
-            if (isExpanded) {
-                this.expandedSections.add(title);
-            } else {
-                this.expandedSections.delete(title);
-            }
-        });
-
-        if (this.expandedSections.has(title) || (!containerEl.querySelector('.settings-section'))) {
-            section.addClass('is-expanded');
-            setIcon(toggle, 'chevron-down');
-            this.expandedSections.add(title);
-        }
-
+    
         return section;
     }
 
@@ -51,31 +31,23 @@ export class MPSettingTab extends PluginSettingTab {
         containerEl.empty();
         containerEl.addClass('mp-settings');
 
-        containerEl.createEl('h2', { text: 'MP Preview 设置' });
-
-        this.createSection(containerEl, '基本设置', el => this.renderBasicSettings(el));
-        this.createSection(containerEl, '模板设置', el => this.renderTemplateSettings(el));
-        this.createSection(containerEl, '背景设置', el => this.renderBackgroundSettings(el));
+        this.createSection(containerEl, '基本选项', el => this.renderBasicSettings(el));
+        this.createSection(containerEl, '模板选项', el => this.renderTemplateSettings(el));
+        this.createSection(containerEl, '背景选项', el => this.renderBackgroundSettings(el));
     }
 
     private renderBasicSettings(containerEl: HTMLElement): void {
         // 字体管理区域
         const fontSection = containerEl.createDiv('mp-settings-subsection');
         const fontHeader = fontSection.createDiv('mp-settings-subsection-header');
-        const fontToggle = fontHeader.createSpan('mp-settings-subsection-toggle');
-        setIcon(fontToggle, 'chevron-right');
-
-        fontHeader.createEl('h3', { text: '字体管理' });
-
+        
+        new Setting(fontHeader).setName('字体管理').setHeading();
+    
         const fontContent = fontSection.createDiv('mp-settings-subsection-content');
-
-        // 折叠/展开逻辑
-        fontHeader.addEventListener('click', () => {
-            const isExpanded = !fontSection.hasClass('is-expanded');
-            fontSection.toggleClass('is-expanded', isExpanded);
-            setIcon(fontToggle, isExpanded ? 'chevron-down' : 'chevron-right');
-        });
-
+        
+        // 移除折叠/展开逻辑和图标
+        fontSection.addClass('is-expanded'); // 始终保持展开状态
+    
         // 字体列表
         const fontList = fontContent.createDiv('font-management');
         this.plugin.settingsManager.getFontOptions().forEach(font => {
@@ -141,27 +113,20 @@ export class MPSettingTab extends PluginSettingTab {
         // 模板显示设置部分 - 从基本设置移动到这里
         const templateVisibilitySection = containerEl.createDiv('mp-settings-subsection');
         const templateVisibilityHeader = templateVisibilitySection.createDiv('mp-settings-subsection-header');
-
-        const templateVisibilityToggle = templateVisibilityHeader.createSpan('mp-settings-subsection-toggle');
-        setIcon(templateVisibilityToggle, 'chevron-right');
-
-        templateVisibilityHeader.createEl('h3', { text: '模板显示设置' });
-
+    
+        new Setting(templateVisibilityHeader).setName('模板显示选项').setHeading();
+    
         const templateVisibilityContent = templateVisibilitySection.createDiv('mp-settings-subsection-content');
-
-        // 折叠/展开逻辑
-        templateVisibilityHeader.addEventListener('click', () => {
-            const isExpanded = !templateVisibilitySection.hasClass('is-expanded');
-            templateVisibilitySection.toggleClass('is-expanded', isExpanded);
-            setIcon(templateVisibilityToggle, isExpanded ? 'chevron-down' : 'chevron-right');
-        });
-
+        
+        // 移除折叠/展开逻辑和图标
+        templateVisibilitySection.addClass('is-expanded'); // 始终保持展开状态
+    
         // 模板选择容器
         const templateSelectionContainer = templateVisibilityContent.createDiv('template-selection-container');
 
         // 左侧：所有模板列表
         const allTemplatesContainer = templateSelectionContainer.createDiv('all-templates-container');
-        allTemplatesContainer.createEl('h4', { text: '隐藏模板' });
+        new Setting(allTemplatesContainer).setName('隐藏模板').setHeading();
         const allTemplatesList = allTemplatesContainer.createDiv('templates-list');
 
         // 中间：控制按钮
@@ -171,7 +136,7 @@ export class MPSettingTab extends PluginSettingTab {
 
         // 右侧：显示的模板列表
         const visibleTemplatesContainer = templateSelectionContainer.createDiv('visible-templates-container');
-        visibleTemplatesContainer.createEl('h4', { text: '显示模板' });
+        new Setting(visibleTemplatesContainer).setName('显示模板').setHeading();
         const visibleTemplatesList = visibleTemplatesContainer.createDiv('templates-list');
 
         // 获取所有模板
@@ -258,7 +223,7 @@ export class MPSettingTab extends PluginSettingTab {
         // 模板管理区域
         const templateList = containerEl.createDiv('template-management');
         // 渲染自定义模板
-        templateList.createEl('h4', { text: '自定义模板', cls: 'template-custom-header' });
+        new Setting(templateList).setName('自定义模板').setClass('template-custom-header').setHeading();
         this.plugin.settingsManager.getAllTemplates()
             .filter(template => !template.isPreset)
             .forEach(template => {
@@ -327,27 +292,20 @@ export class MPSettingTab extends PluginSettingTab {
         // 背景显示设置部分
         const backgroundVisibilitySection = containerEl.createDiv('mp-settings-subsection');
         const backgroundVisibilityHeader = backgroundVisibilitySection.createDiv('mp-settings-subsection-header');
-
-        const backgroundVisibilityToggle = backgroundVisibilityHeader.createSpan('mp-settings-subsection-toggle');
-        setIcon(backgroundVisibilityToggle, 'chevron-right');
-
-        backgroundVisibilityHeader.createEl('h3', { text: '背景显示设置' });
-
+    
+        new Setting(backgroundVisibilityHeader).setName('背景显示选项').setHeading();
+    
         const backgroundVisibilityContent = backgroundVisibilitySection.createDiv('mp-settings-subsection-content');
-
-        // 折叠/展开逻辑
-        backgroundVisibilityHeader.addEventListener('click', () => {
-            const isExpanded = !backgroundVisibilitySection.hasClass('is-expanded');
-            backgroundVisibilitySection.toggleClass('is-expanded', isExpanded);
-            setIcon(backgroundVisibilityToggle, isExpanded ? 'chevron-down' : 'chevron-right');
-        });
-
+        
+        // 移除折叠/展开逻辑和图标
+        backgroundVisibilitySection.addClass('is-expanded'); // 始终保持展开状态
+    
         // 背景选择容器
         const backgroundSelectionContainer = backgroundVisibilityContent.createDiv('background-selection-container');
 
         // 左侧：所有背景列表
         const allBackgroundsContainer = backgroundSelectionContainer.createDiv('all-backgrounds-container');
-        allBackgroundsContainer.createEl('h4', { text: '隐藏背景' });
+        new Setting(allBackgroundsContainer).setName('隐藏背景').setHeading();
         const allBackgroundsList = allBackgroundsContainer.createDiv('backgrounds-list');
 
         // 中间：控制按钮
@@ -357,7 +315,7 @@ export class MPSettingTab extends PluginSettingTab {
 
         // 右侧：显示的背景列表
         const visibleBackgroundsContainer = backgroundSelectionContainer.createDiv('visible-backgrounds-container');
-        visibleBackgroundsContainer.createEl('h4', { text: '显示背景' });
+        new Setting(visibleBackgroundsContainer).setName('显示背景').setHeading();
         const visibleBackgroundsList = visibleBackgroundsContainer.createDiv('backgrounds-list');
 
         // 获取所有背景
@@ -445,7 +403,7 @@ export class MPSettingTab extends PluginSettingTab {
         const backgroundList = containerEl.createDiv('background-management');
 
         // 渲染自定义背景
-        backgroundList.createEl('h4', { text: '自定义背景', cls: 'background-custom-header' });
+        new Setting(backgroundList).setName('自定义背景').setClass('background-custom-header').setHeading();
         this.plugin.settingsManager.getAllBackgrounds()
             .filter(background => !background.isPreset)
             .forEach(background => {
