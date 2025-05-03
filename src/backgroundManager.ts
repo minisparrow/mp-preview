@@ -1,32 +1,41 @@
-import { backgrounds } from './backgrounds';
+import { SettingsManager } from "./settings/settings";
 
 export interface Background {
     id: string;
     name: string;
     style: string;
+    isPreset?: boolean;
+    isVisible?: boolean;
 }
 
 export class BackgroundManager {
-    private backgrounds: Background[];
     private currentBackground: Background | null = null;
+    private settingsManager: SettingsManager;
 
-    constructor() {
-        this.backgrounds = backgrounds.backgrounds;
+    constructor(settingsManager: SettingsManager) {
+        this.settingsManager = settingsManager;
     }
 
-    public getAllBackgrounds(): Background[] {
-        return this.backgrounds;
-    }
-
-    public setBackground(id: string | null) {
+    public setBackground(id: string | null): boolean {
         if (!id) {
             this.currentBackground = null;
-            return;
+            return true;
         }
-        const background = this.backgrounds.find(bg => bg.id === id);
+        
+        const background = this.settingsManager.getBackground(id);
         if (background) {
+            // 检查背景是否可见
+            if (background.isVisible === false) {
+                console.warn(`尝试设置不可见的背景: ${id}`);
+                return false;
+            }
+            
             this.currentBackground = background;
+            return true;
         }
+        
+        console.warn(`未找到背景: ${id}`);
+        return false;
     }
 
     public applyBackground(element: HTMLElement) {

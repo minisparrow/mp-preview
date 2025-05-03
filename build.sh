@@ -5,7 +5,7 @@ version=$(grep '"version"' manifest.json | cut -d '"' -f 4)
 zip_name="mp-preview-${version}.zip"
 
 # 检查目标文件是否存在
-if [ -f "../${zip_name}" ]; then
+if [ -f "../../${zip_name}" ]; then  # 修改路径检查到上两层
     read -p "文件 ${zip_name} 已存在，是否覆盖？(y/n) " answer
     if [ "$answer" != "y" ]; then
         echo "打包已取消"
@@ -26,11 +26,7 @@ cd ../temp
 # 创建 zip 文件
 zip -r "${zip_name}" mp-preview
 
-# 移动 zip 文件到上级目录
-mv "${zip_name}" ../
-
-# 清理临时目录
-cd ..
-rm -rf temp
+# 移动 zip 文件到上两层目录
+mv "${zip_name}" ../../
 
 echo "打包完成：${zip_name}"

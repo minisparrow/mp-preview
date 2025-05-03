@@ -1,4 +1,5 @@
 import { Template } from '../templateManager';
+import { Background } from '../backgroundManager';
 
 interface MPSettings {
     backgroundId: string;
@@ -7,6 +8,8 @@ interface MPSettings {
     fontSize: number;
     templates: Template[];
     customTemplates: Template[];
+    backgrounds: Background[];
+    customBackgrounds: Background[];
     customFonts: { value: string; label: string; isPreset?: boolean }[];
 }
 
@@ -17,6 +20,8 @@ const DEFAULT_SETTINGS: MPSettings = {
     fontSize: 16,
     templates: [],
     customTemplates: [],
+    backgrounds: [],
+    customBackgrounds: [],
     customFonts: [
         {
             value: 'Optima-Regular, Optima, PingFangSC-light, PingFangTC-light, "PingFang SC", Cambria, Cochin, Georgia, Times, "Times New Roman", serif',
@@ -54,6 +59,21 @@ export class SettingsManager {
         }
         if (!savedData.customTemplates) {
             savedData.customTemplates = [];
+        }
+        if (!savedData.customFonts) {
+            savedData.customFonts = DEFAULT_SETTINGS.customFonts;
+        }
+        // 加载背景设置
+        if (!savedData.backgrounds || savedData.backgrounds.length === 0) {
+            const { backgrounds } = await import('../backgrounds');
+            savedData.backgrounds = backgrounds.backgrounds.map(background => ({
+                ...background,
+                isPreset: true,
+                isVisible: true
+            }));
+        }
+        if (!savedData.customBackgrounds) {
+            savedData.customBackgrounds = [];
         }
         if (!savedData.customFonts) {
             savedData.customFonts = DEFAULT_SETTINGS.customFonts;
@@ -154,5 +174,63 @@ export class SettingsManager {
             this.settings.customFonts[index] = { ...newFont, isPreset: false };
             await this.saveSettings();
         }
+    }
+
+    // 背景相关方法
+    getAllBackgrounds(): Background[] {
+        return [...this.settings.backgrounds, ...this.settings.customBackgrounds];
+    }
+
+    getVisibleBackgrounds(): Background[] {
+        return this.getAllBackgrounds().filter(background => background.isVisible !== false);
+    }
+
+    getBackground(backgroundId: string): Background | undefined {
+        return this.settings.backgrounds.find(background => background.id === backgroundId)
+            || this.settings.customBackgrounds.find(background => background.id === backgroundId);
+    }
+
+    async addCustomBackground(background: Background) {
+        background.isPreset = false;
+        background.isVisible = true;  // 默认可见
+        this.settings.customBackgrounds.push(background);
+        await this.saveSettings();
+    }
+
+    async updateBackground(backgroundId: string, updatedBackground: Partial<Background>) {
+        const presetBackgroundIndex = this.settings.backgrounds.findIndex(b => b.id === backgroundId);
+        if (presetBackgroundIndex !== -1) {
+            this.settings.backgrounds[presetBackgroundIndex] = {
+                ...this.settings.backgrounds[presetBackgroundIndex],
+                ...updatedBackground
+            };
+            await this.saveSettings();
+            return true;
+        }
+
+        const customBackgroundIndex = this.settings.customBackgrounds.findIndex(b => b.id === backgroundId);
+        if (customBackgroundIndex !== -1) {
+            this.settings.customBackgrounds[customBackgroundIndex] = {
+                ...this.settings.customBackgrounds[customBackgroundIndex],
+                ...updatedBackground
+            };
+            await this.saveSettings();
+            return true;
+        }
+
+        return false;
+    }
+
+    async removeBackground(backgroundId: string): Promise<boolean> {
+        const background = this.getBackground(backgroundId);
+        if (background && !background.isPreset) {
+            this.settings.customBackgrounds = this.settings.customBackgrounds.filter(b => b.id !== backgroundId);
+            if (this.settings.backgroundId === backgroundId) {
+                this.settings.backgroundId = 'default';
+            }
+            await this.saveSettings();
+            return true;
+        }
+        return false;
     }
 }

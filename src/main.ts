@@ -7,14 +7,14 @@ import { DonateManager } from './donateManager';
 import { MPSettingTab } from './settings/MPSettingTab';
 export default class MPPlugin extends Plugin {
     settingsManager: SettingsManager;
-
+    templateManager: TemplateManager;
     async onload() {
         // 初始化设置管理器
         this.settingsManager = new SettingsManager(this);
         await this.settingsManager.loadSettings();
 
         // 初始化模板管理器
-        const templateManager = new TemplateManager(this.app, this.settingsManager);
+        this.templateManager = new TemplateManager(this.app, this.settingsManager);
 
         // 初始化转换器
         MPConverter.initialize(this.app);
@@ -24,7 +24,7 @@ export default class MPPlugin extends Plugin {
         // 注册视图
         this.registerView(
             VIEW_TYPE_MP,
-            (leaf) => new MPView(leaf, templateManager, this.settingsManager)
+            (leaf) => new MPView(leaf, this.templateManager, this.settingsManager)
         );
 
         // 自动打开视图但不聚焦
