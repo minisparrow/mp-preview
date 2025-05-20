@@ -29,6 +29,15 @@ export class MPConverter {
             el.classList.add('mp-inline');
         });
 
+        // 处理段落和有序列表之间的间距
+        container.querySelectorAll('p + ol, p + ul').forEach(list => {
+            const paragraph = list.previousElementSibling;
+            if (paragraph && paragraph.tagName === 'P') {
+                paragraph.classList.add('mp-paragraph-before-list');
+                list.classList.add('mp-list-after-paragraph');
+            }
+        });
+
         // 处理代码块
         container.querySelectorAll('pre code').forEach(el => {
             const pre = el.parentElement;
