@@ -41,6 +41,7 @@
             "inline": "background: #fafafa; padding: 2px 6px; border-radius: 4px; color: #333; font-size: 14px; border: 1px solid #eee;"
         },
         "quote": "border-left: 4px solid #262626; border-radius: 6px; padding: 10px 10px; background: #fafafa; margin: 0.8em 0; color: #404040; font-style: italic; word-wrap: break-word;",
+        "image": "max-width: 100%; height: auto; margin: 1em auto; display: block;",
         "link": "color: #262626; text-decoration: none; border-bottom: 1px solid #262626;",
         "emphasis": {
             "strong": "font-weight: bold; color: #262626;",

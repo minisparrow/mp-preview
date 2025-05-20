@@ -1,7 +1,7 @@
 # MP Preview
 一键将 Obsidian 笔记转换为微信公众号格式的插件。
 
-![downloads](https://img.shields.io/badge/downloads-1K-brightgreen) ![version](https://img.shields.io/badge/version-1.0.1-blue) ![license](https://img.shields.io/badge/license-MIT-green)  [![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-支持作者-yellow)](https://ko-fi.com/bruceyeban)
+![downloads](https://img.shields.io/badge/dynamic/json?color=brightgreen&label=downloads&query=%24%5B%22mp-preview%22%5D.downloads&url=https%3A%2F%2Fraw.githubusercontent.com%2Fobsidianmd%2Fobsidian-releases%2Fmaster%2Fcommunity-plugin-stats.json&style=flat) ![version](https://img.shields.io/github/v/tag/Yeban8090/mp-preview?color=blue&label=version&style=flat) ![license](https://img.shields.io/badge/license-MIT-green) [![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-支持作者-yellow)](#支持作者)
 
 ## 功能特点
 - 📝 一键将 Markdown 文档转换为微信公众号格式
@@ -48,9 +48,25 @@
 
 ## 支持作者
 如果这个插件对你有所帮助，可以考虑请作者喝杯咖啡 ☕：
-- 微信支付
-- 支付宝
-- [![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-支持作者-yellow)](https://ko-fi.com/bruceyeban)
+
+<div align="center">
+  <div style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
+    <div style="text-align: center; margin: 1px;">
+      <strong>微信支付</strong><br/>
+      <img src="src/assets/donate/wechat_pay.png" alt="微信支付" width="180px" style="margin-top: 10px;">
+    </div>
+    <div style="text-align: center; margin: 1px;">
+      <strong>支付宝</strong><br/>
+      <img src="src/assets/donate/alipay.png" alt="支付宝" width="180px" style="margin-top: 10px;">
+    </div>
+    <div style="text-align: center; margin: 1px;">
+      <strong>Buy Me a Coffee</strong><br/>
+      <a href="https://ko-fi.com/bruceyeban" style="margin-top: 10px; display: inline-block;">
+        <img src="https://img.shields.io/badge/Buy%20Me%20a%20Coffee-支持作者-yellow?style=for-the-badge&logo=ko-fi" alt="Buy Me a Coffee" />
+      </a>
+    </div>
+  </div>
+</div>
 
 您的支持是我持续改进这个插件的动力！
 

@@ -11,6 +11,15 @@
     border: 1px solid rgba(82, 144, 220, 0.08);
 }
 
+/* 调整段落和列表之间的间距 */
+.mp-content-section .mp-paragraph-before-list {
+    margin-bottom: 0.5em !important; 
+}
+
+.mp-content-section .mp-list-after-paragraph {
+    margin-top: 0.5em !important; /* 减小列表顶部边距 */
+}
+
 /* 链接样式 */
 .mp-content-section a {
     color: var(--text-accent);
