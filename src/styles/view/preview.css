@@ -11,13 +11,16 @@
     border: 1px solid rgba(82, 144, 220, 0.08);
 }
 
-/* 调整段落和列表之间的间距 */
-.mp-content-section .mp-paragraph-before-list {
-    margin-bottom: 0.5em !important; 
+/* 段落 */
+.mp-content-section p {
+    margin: 0;
+    padding: 0;
 }
 
-.mp-content-section .mp-list-after-paragraph {
-    margin-top: 0.5em !important; /* 减小列表顶部边距 */
+/* 列表 */
+.mp-content-section ul,ol {
+    margin: 0;
+    padding: 0;
 }
 
 /* 链接样式 */
@@ -81,6 +84,8 @@
     padding: 0;
     line-height: inherit;
 }
+
+
 
 .mp-empty-message {
     display: flex;
