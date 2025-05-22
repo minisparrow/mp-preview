@@ -51,11 +51,11 @@ export class CreateTemplateModal extends Modal {
                     after: ""
                 }
             },
-            paragraph: "line-height: 1.8; margin: 1.2em 0; font-size: 1em; color: #4a4a4a;",
+            paragraph: "line-height: 1.8; margin: 0; font-size: 1em; color: #4a4a4a;",
             list: {
-                container: "padding-left: 32px; margin-bottom: 1.2em; color: #4a4a4a;",
-                item: "margin-bottom: 0.6em; font-size: 1em; color: #4a4a4a; line-height: 1.8;",
-                taskList: "list-style: none; margin-left: -24px; font-size: 1em; color: #4a4a4a; line-height: 1.8;"
+                container: "padding-left: 32px; color: #4a4a4a;",
+                item: "margin-bottom: 0; font-size: 1em; color: #4a4a4a; line-height: 1.8;",
+                taskList: "list-style: none; font-size: 1em; color: #4a4a4a; line-height: 1.8;"
             },
             code: {
                 header: {
@@ -603,7 +603,8 @@ export class CreateTemplateModal extends Modal {
                 const currentMargin = marginMatch ? marginMatch[1] : '';
                 text.setValue(currentMargin)
                     .onChange(value => {
-                        const margin = parseFloat(value) || 1.2;
+                        const value_num = parseFloat(value);
+                        const margin = !isNaN(value_num) ? value_num : 1.2;
                         if (styles.paragraph.match(/margin:\s*[\d.]+em\s*0/)) {
                             // margin: 1.2em 0; 只替换第一个值
                             styles.paragraph = styles.paragraph.replace(/margin:\s*[\d.]+em\s*0/, `margin: ${margin}em 0`);
@@ -708,7 +709,8 @@ export class CreateTemplateModal extends Modal {
                 const currentMargin = styles.item.match(/margin-bottom:\s*([\d.]+)em/)?.[1];
                 text.setValue(currentMargin)
                     .onChange(value => {
-                        const margin = parseFloat(value) || 0.8;
+                        const value_num = parseFloat(value);
+                        const margin = !isNaN(value_num) ? value_num : 1.2;
                         styles.item = styles.item.replace(/margin-bottom:\s*[\d.]+em/, `margin-bottom: ${margin}em`);
                     });
             });

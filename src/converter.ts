@@ -23,19 +23,16 @@ export class MPConverter {
 
     private static processElements(container: HTMLElement | null): void {
         if (!container) return;
-
-        // 处理强调文本
-        container.querySelectorAll('strong, em').forEach(el => {
-            el.classList.add('mp-inline');
-        });
-
-        // 处理段落和有序列表之间的间距
-        container.querySelectorAll('p + ol, p + ul').forEach(list => {
-            const paragraph = list.previousElementSibling;
-            if (paragraph && paragraph.tagName === 'P') {
-                paragraph.classList.add('mp-paragraph-before-list');
-                list.classList.add('mp-list-after-paragraph');
+        // 处理列表项内部元素，用section包裹
+        container.querySelectorAll('li').forEach(li => {
+            // 创建section元素
+            const section = document.createElement('section');
+            // 将li的所有子元素移动到section中
+            while (li.firstChild) {
+                section.appendChild(li.firstChild);
             }
+            // 将section添加到li中
+            li.appendChild(section);
         });
 
         // 处理代码块
