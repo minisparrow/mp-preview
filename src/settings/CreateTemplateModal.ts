@@ -51,19 +51,19 @@ export class CreateTemplateModal extends Modal {
                     after: ""
                 }
             },
-            paragraph: "line-height: 1.8; margin: 0; font-size: 1em; color: #4a4a4a;",
+            paragraph: "line-height: 1.8; margin-top: 1em; font-size: 1em; color: #4a4a4a;",
             list: {
                 container: "padding-left: 32px; color: #4a4a4a;",
-                item: "margin-bottom: 0; font-size: 1em; color: #4a4a4a; line-height: 1.8;",
+                item: "font-size: 1em; color: #4a4a4a; line-height: 1.8;",
                 taskList: "list-style: none; font-size: 1em; color: #4a4a4a; line-height: 1.8;"
             },
             code: {
                 header: {
-                    container: "position: absolute; top: 8px; left: 8px; display: flex; gap: 6px;",
+                    container: "margin-bottom: 1em; display: flex; gap: 6px;",
                     dot: "width: 12px; height: 12px; border-radius: 50%;",
                     colors: ["#ff5f56", "#ffbd2e", "#27c93f"]
                 },
-                block: "position: relative; color: #333; background: #f8f9fc; border-radius: 8px; border: 1px solid #eef0f7; box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin: 1.2em 0; padding: 2em 1em 1em;  font-size: 14px; line-height: 1.6; white-space: pre-wrap;",
+                block: "color: #333; background: #f8f9fc; border-radius: 8px; border: 1px solid #eef0f7; box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin: 1.2em 0; padding: 1em 1em 1em;  font-size: 14px; line-height: 1.6; white-space: pre-wrap;",
                 inline: "background: #f8f9fc; padding: 2px 6px; border-radius: 4px; color: #333; font-size: 14px; border: 1px solid #eef0f7;"
             },
             quote: "border-left: 4px solid #7a7da0; border-radius: 6px; padding: 10px 10px; background: #f8f9fc; margin: 0.8em 0; color: #666b8f; font-style: italic; word-wrap: break-word;",
@@ -595,25 +595,22 @@ export class CreateTemplateModal extends Modal {
             });
 
         new Setting(content)
-            .setName('下边距')
-            .setDesc('设置段落与下方内容之间的间距（单位：em）')
+            .setName('段前距')
+            .setDesc('设置段落与上方内容之间的间距（单位：em）')
             .addText(text => {
-                // 兼容 margin: 1.2em 0; 或 margin: 1.2em; 或没有 margin 的情况
-                const marginMatch = styles.paragraph.match(/margin:\s*([\d.]+)em(?:\s+0)?/);
-                const currentMargin = marginMatch ? marginMatch[1] : '';
+                // 只处理margin-top属性
+                const marginTopMatch = styles.paragraph.match(/margin-top:\s*([\d.]+)em/);
+                const currentMargin = marginTopMatch ? marginTopMatch[1] : '';
                 text.setValue(currentMargin)
                     .onChange(value => {
                         const value_num = parseFloat(value);
-                        const margin = !isNaN(value_num) ? value_num : 1.2;
-                        if (styles.paragraph.match(/margin:\s*[\d.]+em\s*0/)) {
-                            // margin: 1.2em 0; 只替换第一个值
-                            styles.paragraph = styles.paragraph.replace(/margin:\s*[\d.]+em\s*0/, `margin: ${margin}em 0`);
-                        } else if (styles.paragraph.match(/margin:\s*[\d.]+em/)) {
-                            // margin: 1.2em; 替换为 margin: 1.2em 0;
-                            styles.paragraph = styles.paragraph.replace(/margin:\s*[\d.]+em/, `margin: ${margin}em 0`);
+                        const margin = !isNaN(value_num) ? value_num : 1;
+                        if (styles.paragraph.match(/margin-top:\s*[\d.]+em/)) {
+                            // 替换已有的margin-top
+                            styles.paragraph = styles.paragraph.replace(/margin-top:\s*[\d.]+em/, `margin-top: ${margin}em`);
                         } else {
-                            // 没有 margin，直接加上
-                            styles.paragraph += ` margin: ${margin}em 0;`;
+                            // 没有margin-top，直接加上
+                            styles.paragraph += ` margin-top: ${margin}em;`;
                         }
                     });
             });
@@ -701,20 +698,6 @@ export class CreateTemplateModal extends Modal {
                         styles.container = styles.container.replace(/padding-left:\s*\d+px/, `padding-left: ${padding}px`);
                     });
             });
-
-        new Setting(listSection)
-            .setName('列表项间距')
-            .setDesc('设置列表项之间的间距（单位：em）')
-            .addText(text => {
-                const currentMargin = styles.item.match(/margin-bottom:\s*([\d.]+)em/)?.[1];
-                text.setValue(currentMargin)
-                    .onChange(value => {
-                        const value_num = parseFloat(value);
-                        const margin = !isNaN(value_num) ? value_num : 1.2;
-                        styles.item = styles.item.replace(/margin-bottom:\s*[\d.]+em/, `margin-bottom: ${margin}em`);
-                    });
-            });
-
         new Setting(listSection)
             .setName('列表文本颜色')
             .setDesc('设置列表文本的颜色')
