@@ -36,9 +36,16 @@ export class MPConverter {
         });
 
         // 处理代码块
-        container.querySelectorAll('pre code').forEach(el => {
-            const pre = el.parentElement;
-            if (pre) {
+        container.querySelectorAll('pre').forEach(pre => {
+            // 过滤掉 frontmatter
+            if (pre.classList.contains('frontmatter')) {
+                // 如果是 frontmatter，直接移除整个元素
+                pre.remove();
+                return;
+            }
+            
+            const codeEl = pre.querySelector('code');
+            if (codeEl) {
                 // 添加 macOS 风格的窗口按钮
                 const header = document.createElement('div');
                 header.className = 'mp-code-header';
