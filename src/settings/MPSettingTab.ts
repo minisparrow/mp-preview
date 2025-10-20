@@ -135,6 +135,62 @@ export class MPSettingTab extends PluginSettingTab {
                         }
                     ).open();
                 }));
+
+        // 公式渲染设置（添加在字体管理之后）
+        const mathSettingContainer = fontContent.createDiv('mp-settings-math');
+        new Setting(mathSettingContainer)
+            .setName('将公式转换为图片')
+            .setDesc('启用后复制到公众号时会把 KaTeX/MathJax 等公式渲染为图片以保证显示一致（不可编辑）。')
+            .addToggle(toggle => toggle
+                .setValue(this.plugin.settingsManager.getSettings().renderMathAsImage ?? true)
+                .onChange(async (value) => {
+                    await this.plugin.settingsManager.updateSettings({ renderMathAsImage: value });
+                }));
+
+        // 上传到 sm.ms 的选项
+        new Setting(mathSettingContainer)
+            .setName('上传公式图片到 sm.ms（可选）')
+            .setDesc('开启后会把生成的公式图片上传到 sm.ms 并使用外链，避免目标编辑器剥离 data:URI。')
+            .addToggle(toggle => toggle
+                .setValue(this.plugin.settingsManager.getSettings().uploadToSmMs ?? false)
+                .onChange(async (value) => {
+                    await this.plugin.settingsManager.updateSettings({ uploadToSmMs: value });
+                    this.display();
+                }));
+
+        // 若开启，则显示 token 输入框
+        if (this.plugin.settingsManager.getSettings().uploadToSmMs) {
+            new Setting(mathSettingContainer)
+                .setName('sm.ms Token（可选）')
+                .setDesc('如果你有 sm.ms 的 token，可填入以使用个人账号上传并避免匿名限制。')
+                .addText(text => text
+                    .setValue(this.plugin.settingsManager.getSettings().smMsToken || '')
+                    .onChange(async (value) => {
+                        await this.plugin.settingsManager.updateSettings({ smMsToken: value });
+                    }));
+        }
+
+        // 保存图片到本地 vault 的选项
+        new Setting(mathSettingContainer)
+            .setName('将公式/图片保存到 Vault 目录（本地）')
+            .setDesc('开启后复制时会把图片保存到仓库目录下并替换为相对路径。')
+            .addToggle(toggle => toggle
+                .setValue(this.plugin.settingsManager.getSettings().saveImagesToVault ?? false)
+                .onChange(async (value) => {
+                    await this.plugin.settingsManager.updateSettings({ saveImagesToVault: value });
+                    this.display();
+                }));
+
+        if (this.plugin.settingsManager.getSettings().saveImagesToVault) {
+            new Setting(mathSettingContainer)
+                .setName('保存目录')
+                .setDesc('相对于 Vault 根目录，如 MP Preview Images')
+                .addText(text => text
+                    .setValue(this.plugin.settingsManager.getSettings().imagesVaultFolder || 'MP Preview Images')
+                    .onChange(async (value) => {
+                        await this.plugin.settingsManager.updateSettings({ imagesVaultFolder: value });
+                    }));
+        }
     }
 
     private renderTemplateSettings(containerEl: HTMLElement): void {

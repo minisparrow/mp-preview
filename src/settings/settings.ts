@@ -6,6 +6,11 @@ interface MPSettings {
     templateId: string;
     fontFamily: string;
     fontSize: number;
+    renderMathAsImage?: boolean;
+    uploadToSmMs?: boolean;
+    smMsToken?: string;
+    saveImagesToVault?: boolean;
+    imagesVaultFolder?: string;
     templates: Template[];
     customTemplates: Template[];
     backgrounds: Background[];
@@ -18,6 +23,11 @@ const DEFAULT_SETTINGS: MPSettings = {
     templateId: 'default',
     fontFamily: '-apple-system',
     fontSize: 16,
+    renderMathAsImage: true,
+    uploadToSmMs: false,
+    smMsToken: '',
+    saveImagesToVault: false,
+    imagesVaultFolder: 'MP Preview Images',
     templates: [],
     customTemplates: [],
     backgrounds: [],

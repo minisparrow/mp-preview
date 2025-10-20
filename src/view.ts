@@ -304,7 +304,28 @@ export class MPView extends ItemView {
                 this.copyButton.setText('复制中...');
                 
                 try {
-                    await CopyManager.copyToClipboard(this.previewEl);
+                    const settings = this.settingsManager.getSettings();
+                    const renderMathAsImage = settings.renderMathAsImage ?? true;
+                    const smMsToken = settings.smMsToken ?? '';
+                    // 如果配置了 token，且未显式关闭上传，则默认开启上传，避免部分编辑器屏蔽 data: URI
+                    const uploadToSmMs = (settings.uploadToSmMs ?? undefined) !== undefined
+                        ? settings.uploadToSmMs
+                        : (!!smMsToken);
+                    const saveImagesToVault = settings.saveImagesToVault ?? false;
+                    const imagesVaultFolder = settings.imagesVaultFolder ?? 'MP Preview Images';
+                    
+                    // 读取当前文件的 Markdown 源码，用于提取公式
+                    let markdownSource = '';
+                    if (this.currentFile) {
+                        try {
+                            markdownSource = await this.app.vault.cachedRead(this.currentFile);
+                        } catch (e) {
+                            console.warn('[MP] Failed to read markdown source:', e);
+                        }
+                    }
+                    
+                    // 传递 app 和 vault 相关上下文 via any
+                    await CopyManager.copyToClipboard(this.previewEl, { renderMathAsImage, uploadToSmMs, smMsToken, saveImagesToVault, imagesVaultFolder, app: (this as any).app, markdownSource });
                     this.copyButton.setText('复制成功');
                     
                     setTimeout(() => {

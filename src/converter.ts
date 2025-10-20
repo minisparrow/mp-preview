@@ -1,4 +1,5 @@
 import { App } from 'obsidian';
+import { mmlToSvg, texToSvg } from './math/svgMath';
 
 export class MPConverter {
     private static app: App;
@@ -19,6 +20,9 @@ export class MPConverter {
 
         // 处理元素
         this.processElements(section);
+
+    // 将数学公式统一转换为内联 SVG，避免依赖页面样式（参考 WeWrite）
+    this.renderMathToSvg(section);
     }
 
     private static processElements(container: HTMLElement | null): void {
@@ -87,6 +91,91 @@ export class MPConverter {
                 }
             } catch (error) {
                 console.error('图片处理失败:', error);
+            }
+        });
+    }
+
+    // 将 MathJax/KaTeX 渲染结果替换为内联 SVG
+    private static renderMathToSvg(container: HTMLElement) {
+        const candidates = new Set<HTMLElement>();
+        container.querySelectorAll('.math, .math-block, .katex, .katex-display, .MathJax, mjx-container, mjx-math').forEach(el => candidates.add(el as HTMLElement));
+        console.log('[MP Converter] Found math candidates:', candidates.size);
+        if (candidates.size === 0) return;
+
+        const toOuterSvg = (el: HTMLElement): { svg?: string; display: boolean; tex?: string; mml?: string } => {
+            // 判断是否块级数学
+            const display = el.classList.contains('katex-display') || el.classList.contains('math-block') || el.tagName.toLowerCase() === 'mjx-container';
+
+            console.log('[MP Converter] Analyzing element:', {
+                tag: el.tagName,
+                classes: Array.from(el.classList),
+                innerHTML: el.innerHTML.substring(0, 300)
+            });
+
+            // 1) MathJax CHTML 的辅助 MathML
+            const mml1 = el.querySelector('mjx-assistive-mml > math') as HTMLElement | null;
+            if (mml1) {
+                console.log('[MP Converter] Found mjx-assistive-mml > math');
+                try { return { svg: mmlToSvg(mml1.outerHTML, display), display, mml: mml1.outerHTML }; } catch {}
+            }
+            // 2) KaTeX 的 MathML
+            const mml2 = el.querySelector('.katex-mathml > math') as HTMLElement | null;
+            if (mml2) {
+                console.log('[MP Converter] Found .katex-mathml > math');
+                try { return { svg: mmlToSvg(mml2.outerHTML, display), display, mml: mml2.outerHTML }; } catch {}
+            }
+            // 3) KaTeX annotation 中的 TeX
+            const ann = el.querySelector('.katex-mathml annotation[encoding="application/x-tex"]') as HTMLElement | null;
+            if (ann && ann.textContent) {
+                console.log('[MP Converter] Found KaTeX annotation');
+                try { return { svg: texToSvg(ann.textContent, display), display, tex: ann.textContent }; } catch {}
+            }
+            // 4) 已有内联 SVG
+            const innerSvg = el.querySelector('svg');
+            if (innerSvg) {
+                console.log('[MP Converter] Found inline SVG');
+                return { svg: innerSvg.outerHTML, display };
+            }
+            
+            // 5) 尝试从 script[type="math/tex"] 提取（Obsidian 可能保存原始 TeX）
+            const texScript = el.querySelector('script[type="math/tex"]') as HTMLElement | null;
+            if (texScript && texScript.textContent) {
+                console.log('[MP Converter] Found script[type="math/tex"]:', texScript.textContent.substring(0, 50));
+                try { return { svg: texToSvg(texScript.textContent, display), display, tex: texScript.textContent }; } catch {}
+            }
+            
+            console.warn('[MP Converter] No formula source found in element');
+            return { display };
+        };        // 仅替换外层容器，避免重复
+        const list = Array.from(candidates).filter(el => !Array.from(candidates).some(other => other !== el && other.contains(el)));
+        console.log('[MP Converter] Math elements to convert (deduplicated):', list.length);
+        list.forEach(el => {
+            const { svg, display, tex, mml } = toOuterSvg(el);
+            console.log('[MP Converter] Converting:', {
+                tag: el.tagName,
+                classes: Array.from(el.classList),
+                hasSvg: !!svg,
+                hasTex: !!tex,
+                hasMml: !!mml,
+                display
+            });
+            if (svg) {
+                const wrapper = document.createElement(display ? 'section' : 'span');
+                wrapper.className = display ? 'mp-math-svg block-math' : 'mp-math-svg inline-math';
+                if (tex) { 
+                    wrapper.setAttribute('data-formula', tex); 
+                    wrapper.setAttribute('data-encoding', 'tex'); 
+                    console.log('[MP Converter] Set TeX formula:', tex.substring(0, 50));
+                }
+                else if (mml) { 
+                    wrapper.setAttribute('data-formula', mml); 
+                    wrapper.setAttribute('data-encoding', 'mml'); 
+                    console.log('[MP Converter] Set MathML formula:', mml.substring(0, 50));
+                }
+                wrapper.innerHTML = svg;
+                // 清理原节点，替换为纯 SVG
+                el.parentElement?.replaceChild(wrapper, el);
+                console.log('[MP Converter] Replaced with wrapper:', wrapper.className);
             }
         });
     }
