@@ -23,6 +23,8 @@ export class MPView extends ItemView {
     private customBackgroundSelect: HTMLElement;
     private scrollSyncEnabled: boolean = true;
     private editorScrollHandler: ((e: Event) => void) | null = null;
+    private tocVisible: boolean = false;
+    private tocContainer: HTMLElement | null = null;
 
     constructor(
         leaf: WorkspaceLeaf, 
@@ -65,6 +67,18 @@ export class MPView extends ItemView {
         setIcon(this.lockButton, 'lock');
         this.lockButton.setAttribute('aria-label', '开启实时预览状态');
         this.lockButton.addEventListener('click', () => this.togglePreviewLock());
+        
+        // 目录切换按钮
+        const tocButton = controlsGroup.createEl('button', {
+            cls: 'mp-toc-button',
+            attr: { 'aria-label': '显示/隐藏目录' }
+        });
+        setIcon(tocButton, 'list');
+        tocButton.addEventListener('click', () => {
+            this.toggleToc();
+            // 切换按钮激活状态
+            tocButton.classList.toggle('active', this.tocVisible);
+        });
         
         // 添加背景选择器
         const backgroundOptions = [
@@ -245,8 +259,15 @@ export class MPView extends ItemView {
         });
 
         this.fontSizeSelect.addEventListener('change', updateFontSize);
+        
+        // 创建主内容区域容器
+        const contentArea = container.createEl('div', { cls: 'mp-content-area' });
+        
+        // 目录容器（默认隐藏，显示在上方）
+        this.tocContainer = contentArea.createEl('div', { cls: 'mp-toc-container mp-toc-hidden' });
+        
         // 预览区域
-        this.previewEl = container.createEl('div', { cls: 'mp-preview-area' });
+        this.previewEl = contentArea.createEl('div', { cls: 'mp-preview-area' });
 
         // 底部工具栏
         const bottomBar = container.createEl('div', { cls: 'mp-bottom-bar' });
@@ -459,6 +480,11 @@ export class MPView extends ItemView {
         this.templateManager.applyTemplate(this.previewEl);
         this.backgroundManager.applyBackground(this.previewEl);
 
+        // 更新目录
+        if (this.tocVisible) {
+            this.updateToc();
+        }
+
         // 根据滚动位置决定是否自动滚动（仅在未启用滚动同步时）
         if (!this.scrollSyncEnabled) {
             if (isAtBottom) {
@@ -546,6 +572,210 @@ export class MPView extends ItemView {
     // 获取字体选项
     private getFontOptions() {
         return this.settingsManager.getFontOptions();
+    }
+
+    // 设置目录拖动调整大小功能
+    private setupTocResize(handle: HTMLElement) {
+        console.log('[Resize] Setting up resize handler', handle);
+        
+        let isResizing = false;
+        let startY = 0;
+        let startHeight = 0;
+
+        const onMouseDown = (e: MouseEvent) => {
+            console.log('[Resize] Mouse down', e.clientY);
+            if (!this.tocContainer) {
+                console.log('[Resize] No tocContainer!');
+                return;
+            }
+            
+            isResizing = true;
+            startY = e.clientY;
+            startHeight = this.tocContainer.offsetHeight;
+            
+            console.log('[Resize] Start height:', startHeight);
+            
+            // 添加拖动时的样式
+            document.body.classList.add('mp-resizing');
+            handle.classList.add('mp-resizing');
+            
+            e.preventDefault();
+        };
+
+        const onMouseMove = (e: MouseEvent) => {
+            if (!isResizing || !this.tocContainer) return;
+            
+            const deltaY = e.clientY - startY;
+            const newHeight = startHeight + deltaY;
+            
+            // 限制最小和最大高度
+            const minHeight = 100;
+            const maxHeight = 800;  // 增加到 800px
+            const clampedHeight = Math.max(minHeight, Math.min(maxHeight, newHeight));
+            
+            console.log('[Resize] Moving:', { 
+                startY, 
+                currentY: e.clientY, 
+                deltaY, 
+                startHeight,
+                newHeight, 
+                clampedHeight,
+                minHeight,
+                maxHeight,
+                isAtMax: newHeight >= maxHeight,
+                isAtMin: newHeight <= minHeight
+            });
+            
+            // 设置新高度 - 使用 setProperty 和 important 优先级
+            this.tocContainer.style.setProperty('max-height', `${clampedHeight}px`, 'important');
+            this.tocContainer.style.setProperty('height', `${clampedHeight}px`, 'important');
+            
+            console.log('[Resize] Applied styles:', {
+                maxHeight: this.tocContainer.style.maxHeight,
+                height: this.tocContainer.style.height,
+                computedHeight: window.getComputedStyle(this.tocContainer).height
+            });
+            
+            e.preventDefault();
+        };
+
+        const onMouseUp = () => {
+            if (!isResizing) return;
+            
+            console.log('[Resize] Mouse up');
+            isResizing = false;
+            document.body.classList.remove('mp-resizing');
+            handle.classList.remove('mp-resizing');
+        };
+
+        // 绑定事件
+        console.log('[Resize] Binding events to handle');
+        handle.addEventListener('mousedown', onMouseDown);
+        document.addEventListener('mousemove', onMouseMove);
+        document.addEventListener('mouseup', onMouseUp);
+        
+        // 清理函数（在组件销毁时调用）
+        this.register(() => {
+            console.log('[Resize] Cleaning up');
+            handle.removeEventListener('mousedown', onMouseDown);
+            document.removeEventListener('mousemove', onMouseMove);
+            document.removeEventListener('mouseup', onMouseUp);
+        });
+    }
+
+    // 切换目录显示/隐藏
+    private toggleToc() {
+        this.tocVisible = !this.tocVisible;
+        
+        if (this.tocContainer) {
+            if (this.tocVisible) {
+                this.tocContainer.removeClass('mp-toc-hidden');
+                this.tocContainer.addClass('mp-toc-visible');
+            } else {
+                this.tocContainer.removeClass('mp-toc-visible');
+                this.tocContainer.addClass('mp-toc-hidden');
+            }
+        }
+        
+        // 显示目录时更新内容
+        if (this.tocVisible) {
+            this.updateToc();
+        }
+    }
+
+    // 更新目录内容
+    private updateToc() {
+        if (!this.tocContainer || !this.previewEl) return;
+        
+        this.tocContainer.empty();
+        
+        // 创建可滚动的内容区域
+        const tocContent = this.tocContainer.createEl('div', { cls: 'mp-toc-content' });
+        
+        // 添加标题
+        const tocTitle = tocContent.createEl('div', { 
+            cls: 'mp-toc-title',
+            text: '目录'
+        });
+        
+        // 获取所有标题
+        const headings = this.previewEl.querySelectorAll('h1, h2, h3, h4, h5, h6');
+        
+        if (headings.length === 0) {
+            tocContent.createEl('div', {
+                cls: 'mp-toc-empty',
+                text: '文档中没有标题'
+            });
+            // 仍然添加拖动手柄
+            const resizeHandle = this.tocContainer.createEl('div', { cls: 'mp-toc-resize-handle' });
+            resizeHandle.createEl('div', { cls: 'mp-toc-resize-line' });
+            this.setupTocResize(resizeHandle);
+            return;
+        }
+        
+        // 创建目录列表
+        const tocList = tocContent.createEl('div', { cls: 'mp-toc-list' });
+        
+        headings.forEach((heading, index) => {
+            const level = parseInt(heading.tagName.substring(1)); // h1 -> 1, h2 -> 2, etc.
+            const text = heading.textContent || '';
+            
+            const tocItem = tocList.createEl('div', {
+                cls: `mp-toc-item mp-toc-level-${level}`,
+                text: text
+            });
+            
+            // 添加点击事件，滚动到对应标题
+            tocItem.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const targetElement = heading as HTMLElement;
+                
+                if (!this.previewEl || !targetElement) {
+                    console.log('[TOC] Missing elements:', { 
+                        previewEl: !!this.previewEl, 
+                        targetElement: !!targetElement 
+                    });
+                    return;
+                }
+                
+                console.log('[TOC] Clicking on:', text, 'Element:', targetElement);
+                
+                // 计算目标元素相对于previewEl的位置
+                const previewTop = this.previewEl.scrollTop;
+                const previewRect = this.previewEl.getBoundingClientRect();
+                const targetRect = targetElement.getBoundingClientRect();
+                
+                // 目标位置 = 当前滚动位置 + 目标相对位置
+                const targetScrollTop = previewTop + (targetRect.top - previewRect.top);
+                
+                console.log('[TOC] Scroll info:', {
+                    previewTop,
+                    previewRect: { top: previewRect.top, height: previewRect.height },
+                    targetRect: { top: targetRect.top, height: targetRect.height },
+                    targetScrollTop,
+                    offset: targetScrollTop - 30
+                });
+                
+                // 滚动到目标位置，留出30px的顶部空间
+                this.previewEl.scrollTo({
+                    top: Math.max(0, targetScrollTop - 30),
+                    behavior: 'smooth'
+                });
+                
+                // 高亮当前项
+                tocList.querySelectorAll('.mp-toc-item').forEach(item => {
+                    item.classList.remove('active');
+                });
+                tocItem.classList.add('active');
+            });
+        });
+        
+        // 添加拖动手柄到目录容器底部
+        const resizeHandle = this.tocContainer.createEl('div', { cls: 'mp-toc-resize-handle' });
+        resizeHandle.createEl('div', { cls: 'mp-toc-resize-line' });
+        this.setupTocResize(resizeHandle);
     }
 
     // 设置滚动同步

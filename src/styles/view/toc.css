@@ -1,0 +1,231 @@
+/* 主内容区域布局 */
+.mp-content-area {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 0;
+    flex: 1 1 auto;
+    overflow: hidden;
+    position: relative;
+}
+
+/* 目录容器 - 顶部栏 */
+.mp-toc-container {
+    width: 100% !important;
+    max-height: 180px;  /* 移除 !important，允许 JS 覆盖 */
+    background: var(--background-primary);
+    border-radius: 0;
+    border: none;
+    border-bottom: 1px solid var(--background-modifier-border);
+    box-shadow: none;
+    overflow: hidden;
+    padding: 0;
+    flex-shrink: 0 !important;
+    flex-grow: 0 !important;
+    order: 1 !important;
+    box-sizing: border-box;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+/* 目录隐藏状态 */
+.mp-toc-container.mp-toc-hidden {
+    display: none !important;
+}
+
+/* 目录显示状态 */
+.mp-toc-container.mp-toc-visible {
+    display: flex !important;
+}
+
+/* 目录内容区域 - 可滚动 */
+.mp-toc-content {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 15px 20px 10px 20px;
+    min-height: 0;
+}
+
+/* 预览区域调整 */
+.mp-content-area .mp-preview-area {
+    flex: 1 1 auto !important;
+    min-width: 300px !important;
+    width: 100%;
+    order: 2 !important;
+    overflow-y: auto !important;
+    overflow-x: hidden;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+/* 目录滚动条 */
+.mp-toc-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.mp-toc-container::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.mp-toc-container::-webkit-scrollbar-thumb {
+    background: var(--background-modifier-border);
+    border-radius: 3px;
+}
+
+.mp-toc-container::-webkit-scrollbar-thumb:hover {
+    background: var(--text-muted);
+}
+
+/* 目录标题 */
+.mp-toc-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-normal);
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--background-modifier-border);
+    text-align: center;
+}
+
+/* 目录列表 */
+.mp-toc-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+/* 目录项 */
+.mp-toc-item {
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    color: var(--text-muted);
+    font-size: 13px;
+    line-height: 1.5;
+    word-wrap: break-word;
+    white-space: normal;
+}
+
+.mp-toc-item:hover {
+    background: var(--background-modifier-hover);
+    color: var(--text-normal);
+}
+
+.mp-toc-item.active {
+    background: var(--interactive-accent);
+    color: var(--text-on-accent);
+    font-weight: 500;
+}
+
+/* 不同级别的缩进 */
+.mp-toc-item.mp-toc-level-1 {
+    padding-left: 12px;
+    font-weight: 600;
+    font-size: 14px;
+    margin-top: 8px;
+}
+
+.mp-toc-item.mp-toc-level-2 {
+    padding-left: 20px;
+    margin-top: 4px;
+}
+
+.mp-toc-item.mp-toc-level-3 {
+    padding-left: 32px;
+    font-size: 12px;
+}
+
+.mp-toc-item.mp-toc-level-4 {
+    padding-left: 44px;
+    font-size: 12px;
+}
+
+.mp-toc-item.mp-toc-level-5 {
+    padding-left: 56px;
+    font-size: 11px;
+}
+
+.mp-toc-item.mp-toc-level-6 {
+    padding-left: 68px;
+    font-size: 11px;
+}
+
+/* 空状态 */
+.mp-toc-empty {
+    color: var(--text-muted);
+    font-size: 13px;
+    text-align: center;
+    padding: 40px 20px;
+    font-style: italic;
+}
+
+/* 目录按钮样式 */
+.mp-controls-group .mp-toc-button {
+    width: 36px;
+    padding: 0;
+    margin: 0 4px;
+    flex: none;
+}
+
+.mp-controls-group .mp-toc-button.active {
+    background: var(--interactive-accent);
+    color: var(--text-on-accent);
+}
+
+/* 拖动手柄样式 */
+.mp-toc-resize-handle {
+    flex-shrink: 0;
+    height: 16px;
+    min-height: 16px;
+    cursor: ns-resize;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    background: var(--background-secondary);
+    transition: background 0.2s ease;
+    border-top: 1px solid var(--background-modifier-border);
+    position: relative;
+}
+
+.mp-toc-resize-handle:hover {
+    background: var(--background-modifier-hover);
+}
+
+.mp-toc-resize-handle.mp-resizing {
+    background: var(--interactive-accent);
+}
+
+.mp-toc-resize-line {
+    width: 60px;
+    height: 4px;
+    background: var(--text-muted);
+    border-radius: 3px;
+    transition: all 0.2s ease;
+    pointer-events: none;
+}
+
+.mp-toc-resize-handle:hover .mp-toc-resize-line {
+    width: 80px;
+    height: 5px;
+    background: var(--text-normal);
+}
+
+.mp-toc-resize-handle.mp-resizing .mp-toc-resize-line {
+    width: 100px;
+    height: 5px;
+    background: var(--text-on-accent);
+}
+
+/* 拖动时的全局样式 */
+body.mp-resizing {
+    cursor: ns-resize !important;
+    user-select: none !important;
+}
+
+body.mp-resizing * {
+    cursor: ns-resize !important;
+}

@@ -1,26 +1,27 @@
 /* ===== 基础布局 ===== */
 .mp-view-content {
     height: 100%;
-    padding: 10px 10px 0 10px;
-    overflow: auto;
+    padding: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
 }
 
 /* ===== 工具栏 ===== */
 .mp-toolbar, .mp-bottom-bar {
-    padding: 15px 0;
-    max-width: 580px;
+    padding: 15px 10px;
+    max-width: 100%;
     background: var(--background-secondary);
+    flex-shrink: 0;
 }
 
 .mp-toolbar {
-    top: 0;
-    border-radius: 8px;
+    border-radius: 0;
     border-bottom: 2px solid var(--background-modifier-border);
 }
 
 .mp-bottom-bar {
-    bottom: 0;
-    border-radius: 8px;
+    border-radius: 0;
     border-top: 2px solid var(--background-modifier-border);
 }
 
