@@ -21,6 +21,8 @@ export class MPView extends ItemView {
     private fontSizeSelect: HTMLInputElement;
     private backgroundManager: BackgroundManager;
     private customBackgroundSelect: HTMLElement;
+    private scrollSyncEnabled: boolean = true;
+    private editorScrollHandler: ((e: Event) => void) | null = null;
 
     constructor(
         leaf: WorkspaceLeaf, 
@@ -63,8 +65,6 @@ export class MPView extends ItemView {
         setIcon(this.lockButton, 'lock');
         this.lockButton.setAttribute('aria-label', '开启实时预览状态');
         this.lockButton.addEventListener('click', () => this.togglePreviewLock());
-    
-
         
         // 添加背景选择器
         const backgroundOptions = [
@@ -352,9 +352,19 @@ export class MPView extends ItemView {
             this.app.vault.on('modify', this.onFileModify.bind(this))
         );
 
+        // 监听活动 leaf 的变化，用于滚动同步
+        this.registerEvent(
+            this.app.workspace.on('active-leaf-change', () => {
+                this.setupScrollSync();
+            })
+        );
+
         // 检查当前打开的文件
         const currentFile = this.app.workspace.getActiveFile();
         await this.onFileOpen(currentFile);
+        
+        // 初始化滚动同步
+        this.setupScrollSync();
     }
 
     private updateControlsState(enabled: boolean) {
@@ -397,6 +407,9 @@ export class MPView extends ItemView {
         this.isPreviewLocked = false;
         setIcon(this.lockButton, 'unlock');
         await this.updatePreview();
+        
+        // 重新设置滚动同步
+        setTimeout(() => this.setupScrollSync(), 100);
     }
 
     private async togglePreviewLock() {
@@ -446,17 +459,22 @@ export class MPView extends ItemView {
         this.templateManager.applyTemplate(this.previewEl);
         this.backgroundManager.applyBackground(this.previewEl);
 
-        // 根据滚动位置决定是否自动滚动
-        if (isAtBottom) {
-            // 如果用户在底部附近，自动滚动到底部
-            requestAnimationFrame(() => {
-                this.previewEl.scrollTop = this.previewEl.scrollHeight;
-            });
-        } else {
-            // 否则保持原来的滚动位置
-            const heightDiff = this.previewEl.scrollHeight - prevHeight;
-            this.previewEl.scrollTop = scrollPosition + heightDiff;
+        // 根据滚动位置决定是否自动滚动（仅在未启用滚动同步时）
+        if (!this.scrollSyncEnabled) {
+            if (isAtBottom) {
+                // 如果用户在底部附近，自动滚动到底部
+                requestAnimationFrame(() => {
+                    this.previewEl.scrollTop = this.previewEl.scrollHeight;
+                });
+            } else {
+                // 否则保持原来的滚动位置
+                const heightDiff = this.previewEl.scrollHeight - prevHeight;
+                this.previewEl.scrollTop = scrollPosition + heightDiff;
+            }
         }
+        
+        // 预览更新后重新设置滚动同步
+        setTimeout(() => this.setupScrollSync(), 50);
     }
 
     // 添加自定义下拉选择器创建方法
@@ -528,5 +546,80 @@ export class MPView extends ItemView {
     // 获取字体选项
     private getFontOptions() {
         return this.settingsManager.getFontOptions();
+    }
+
+    // 设置滚动同步
+    private setupScrollSync() {
+        // 移除之前的滚动监听器
+        if (this.editorScrollHandler) {
+            const activeView = this.app.workspace.getActiveViewOfType(ItemView);
+            if (activeView && 'editor' in activeView) {
+                const editorView = activeView as any;
+                const cm = editorView.editor?.cm;
+                if (cm?.scrollDOM) {
+                    cm.scrollDOM.removeEventListener('scroll', this.editorScrollHandler);
+                }
+            }
+            this.editorScrollHandler = null;
+        }
+
+        if (!this.scrollSyncEnabled) return;
+
+        // 获取当前活动的编辑器视图
+        const activeView = this.app.workspace.getActiveViewOfType(ItemView);
+        if (!activeView || !('editor' in activeView)) return;
+
+        const editorView = activeView as any;
+        const editor = editorView.editor;
+        const cm = editor?.cm;
+        if (!cm?.scrollDOM) return;
+
+        // 创建编辑器滚动处理器
+        this.editorScrollHandler = () => {
+            if (!this.scrollSyncEnabled || !this.previewEl) return;
+
+            try {
+                // 获取编辑器滚动信息
+                const scrollTop = cm.scrollDOM.scrollTop;
+                const scrollHeight = cm.scrollDOM.scrollHeight;
+                const clientHeight = cm.scrollDOM.clientHeight;
+
+                // 计算滚动百分比
+                const scrollPercentage = scrollHeight > clientHeight 
+                    ? scrollTop / (scrollHeight - clientHeight) 
+                    : 0;
+
+                // 同步到预览窗口
+                const previewScrollHeight = this.previewEl.scrollHeight;
+                const previewClientHeight = this.previewEl.clientHeight;
+                const targetScrollTop = scrollPercentage * (previewScrollHeight - previewClientHeight);
+
+                requestAnimationFrame(() => {
+                    if (this.previewEl) {
+                        this.previewEl.scrollTop = targetScrollTop;
+                    }
+                });
+            } catch (e) {
+                console.error('[Scroll Sync] Error:', e);
+            }
+        };
+
+        // 添加滚动监听
+        cm.scrollDOM.addEventListener('scroll', this.editorScrollHandler, { passive: true });
+    }
+
+    // 清理资源
+    async onClose() {
+        // 移除编辑器滚动监听器
+        if (this.editorScrollHandler) {
+            const activeView = this.app.workspace.getActiveViewOfType(ItemView);
+            if (activeView && 'editor' in activeView) {
+                const editorView = activeView as any;
+                const cm = editorView.editor?.cm;
+                if (cm?.scrollDOM) {
+                    cm.scrollDOM.removeEventListener('scroll', this.editorScrollHandler);
+                }
+            }
+        }
     }
 }
